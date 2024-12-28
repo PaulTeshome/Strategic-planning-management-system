@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box, CssBaseline, ThemeProvider } from '@mui/material';
+import { ColorModeContext, tokens, useMode } from './theme';
+import Layout from './components/global/Layout';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [theme, colorMode] = useMode();
+	const colors = tokens(theme.palette.mode);
+
+	return (
+		<ColorModeContext.Provider value={colorMode}>
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<Box
+					className="app"
+					display="flex"
+					sx={{
+						height: '100vh',
+						overflow: 'hidden',
+
+						[theme.breakpoints.up('xs')]: {
+							flexDirection: 'column-reverse',
+						},
+						[theme.breakpoints.up('md')]: {
+							flexDirection: 'row',
+						},
+					}}
+				>
+					<Layout />
+				</Box>
+			</ThemeProvider>
+		</ColorModeContext.Provider>
+	);
 }
 
 export default App;
