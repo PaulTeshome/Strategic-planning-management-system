@@ -10,6 +10,7 @@ import { useTheme } from '@emotion/react';
 import { Toaster } from 'react-hot-toast';
 import withAuth from '../../utils/withAuth';
 import SmallLoader from '../SmallLoader';
+import NotFound from '../../pages/NotFound';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 
@@ -71,7 +72,7 @@ function Layout() {
 							}
 							return null;
 						})}
-						{/* <Route path="*" element={<NotFound />} /> */}
+						<Route path="*" element={<NotFound />} />
 					</Routes>
 				</Box>
 				<Toaster
