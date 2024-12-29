@@ -136,7 +136,7 @@ const Topbar = () => {
 				},
 				[theme.breakpoints.up('md')]: {
 					position: '',
-					pr: 2,
+					p: 0,
 				},
 			}}
 		>
@@ -144,10 +144,11 @@ const Topbar = () => {
 				display="flex"
 				justifyContent="space-between"
 				alignItems="center"
-				borderRadius="20px"
-				bgcolor={colors.white}
+				borderBottom={`1px solid ${colors.grey[700]}`}
+				height={65}
+				maxHeight={65}
+				bgcolor={colors.grey[100]}
 				width="100%"
-				my={1}
 				p={2}
 				px={matches ? 1 : 3}
 			>
@@ -168,7 +169,7 @@ const Topbar = () => {
 					{matches && (
 						<Menu
 							sx={{
-								'& .MuiPaper-root': { borderRadius: '30px', backgroundColor: colors.white },
+								'& .MuiPaper-root': { borderRadius: '5px', backgroundColor: colors.grey[200] },
 								p: 0,
 							}}
 							id="basic-menu"
@@ -243,7 +244,7 @@ const Topbar = () => {
 					<IconButton component={Link} to="/profile">
 						<PersonOutlinedIcon />
 					</IconButton>
-					<Typography variant="body1" color={colors.blueAccent[200]} mx={1}>
+					<Typography variant="body1" color={colors.aastuBlue[200]} mx={1}>
 						{user.user_name}
 					</Typography>
 				</Box>

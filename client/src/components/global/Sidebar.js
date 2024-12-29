@@ -1,5 +1,5 @@
 import { Fragment, useContext, useState } from 'react';
-import { Box, Collapse, List, ListItemButton, ListItemIcon, Typography, useTheme } from '@mui/material';
+import { Box, Collapse, List, ListItemButton, ListItemIcon, Stack, Typography, useTheme } from '@mui/material';
 import { tokens } from '../../theme';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
@@ -18,6 +18,7 @@ import {
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useLogout from '../../hooks/useLogout';
+import AASTULogoCircle from '../../assets/AASTU_Logo_circle.png';
 
 const Sidebar = () => {
 	const theme = useTheme();
@@ -156,12 +157,12 @@ const Sidebar = () => {
 
 	return (
 		<Box
-			pt={1}
 			sx={{
-				px: 3,
 				alignItems: 'center',
 				justifyContent: 'center',
 				height: '100vh',
+				width: '16.67%',
+				backgroundColor: colors.grey[200],
 				'& .Mui-selected': {
 					backgroundColor: 'transparent',
 				},
@@ -173,6 +174,22 @@ const Sidebar = () => {
 				},
 			}}
 		>
+			<Stack
+				direction="row"
+				alignItems="center"
+				px={2}
+				py={0}
+				width="100%"
+				gap={2}
+				borderBottom={`1px solid ${colors.grey[700]}`}
+				height={65}
+				maxHeight={65}
+			>
+				<img src={AASTULogoCircle} alt="aastu logo" width="30px" height="30px" />
+				<Typography variant="h5" component="h1" fontWeight="bold" color={colors.textBlue[500]}>
+					SPMS
+				</Typography>
+			</Stack>
 			<List
 				component="nav"
 				sx={{
@@ -181,76 +198,51 @@ const Sidebar = () => {
 					flexDirection: 'column',
 					justifyContent: 'center',
 					p: 0,
+					px: 2,
 				}}
 			>
-				<Box
-					bgcolor={colors.white}
-					component="button"
-					onClick={() => {
-						setIsCollapsed(!isCollapsed);
-					}}
-					borderRadius={6}
-					p={3}
-					mx={0.5}
-					display="flex"
-					flexDirection="column"
-					alignItems="center"
-				>
-					<MenuOutlined />
-				</Box>
-				<Box
-					bgcolor={colors.white}
-					borderRadius={10}
-					display="flex"
+				{navElements.map((nav) => {
+					if (nav.requiredRole.includes(user.r_data)) {
+						return nav.element;
+					}
+					return null;
+				})}
+
+				<ListItemButton
+					key="logout-link"
 					sx={{
+						display: 'flex',
 						flexDirection: 'column',
-						py: 3,
-						my: 3,
+						alignItems: 'center',
+						justifyContent: 'center',
+
+						'& .MuiListItemIcon-root': {
+							color: colors.black,
+						},
+						[theme.breakpoints.up('xs')]: {
+							'& .MuiListItemIcon-root': {
+								fontSize: '12px',
+							},
+						},
+						[theme.breakpoints.up('md')]: {
+							'& .MuiListItemIcon-root': {
+								fontSize: '18px',
+							},
+						},
+					}}
+					onClick={() => {
+						setOpenLogout(true);
 					}}
 				>
-					{navElements.map((nav) => {
-						if (nav.requiredRole.includes(user.r_data)) {
-							return nav.element;
-						}
-						return null;
-					})}
-
-					<ListItemButton
-						key="logout-link"
-						sx={{
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							justifyContent: 'center',
-
-							'& .MuiListItemIcon-root': {
-								color: colors.black,
-							},
-							[theme.breakpoints.up('xs')]: {
-								'& .MuiListItemIcon-root': {
-									fontSize: '12px',
-								},
-							},
-							[theme.breakpoints.up('md')]: {
-								'& .MuiListItemIcon-root': {
-									fontSize: '18px',
-								},
-							},
-						}}
-						onClick={() => {
-							setOpenLogout(true);
-						}}
-					>
-						<ListItemIcon>
-							<Logout />
-						</ListItemIcon>
-						<Collapse in={!isCollapsed}>
-							<Typography variant="caption" color={colors.black}>
-								Logout
-							</Typography>
-						</Collapse>
-					</ListItemButton>
-				</Box>
+					<ListItemIcon>
+						<Logout />
+					</ListItemIcon>
+					<Collapse in={!isCollapsed}>
+						<Typography variant="caption" color={colors.black}>
+							Logout
+						</Typography>
+					</Collapse>
+				</ListItemButton>
 			</List>
 			<ConfirmationModal
 				open={openLogout}
