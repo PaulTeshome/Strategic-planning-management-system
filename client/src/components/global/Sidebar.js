@@ -6,10 +6,13 @@ import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube, FaUserDoctor } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
 import {
+	Book,
 	CalendarMonth,
+	ChatRounded,
 	Logout,
 	MenuOutlined,
 	Money,
+	NextPlan,
 	People,
 	PersonAdd,
 	PersonSearch,
@@ -27,7 +30,7 @@ const Sidebar = () => {
 	const { user } = useContext(MyContext);
 	const logOut = useLogout();
 
-	const [isCollapsed, setIsCollapsed] = useState(false);
+	// const [isCollapsed, setIsCollapsed] = useState(false);
 	const [openLogout, setOpenLogout] = useState(false);
 
 	const closeLogout = () => {
@@ -41,43 +44,18 @@ const Sidebar = () => {
 
 	const navElements = [
 		{
-			requiredRole: ['admin'],
+			requiredRole: ['none'],
 			element: (
-				<Fragment key="ad">
+				<Fragment key="pres">
+					<NavItem key="/admin/" title="Dashboard" to="/admin/" icon={<FaDashcube />} />
+					<NavItem key="/admin/plan" title="Plan" to="/admin/plan" icon={<Book />} />
+					<NavItem key="/admin/report" title="Report" to="/admin/report" icon={<BarChartOutlinedIcon />} />
+					<NavItem key="/admin/schedule" title="Schedule" to="/admin/schedule" icon={<CalendarMonth />} />
 					<NavItem
-						isCollapsed={isCollapsed}
-						key="/admin/"
-						title="Dashboard"
-						to="/admin/"
-						icon={<FaDashcube />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/admin/doctors"
-						title="Doctors"
-						to="/admin/doctors"
-						icon={<FaUserDoctor />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/admin/receptionists"
-						title="Receptionsts"
-						to="/admin/receptionists"
-						icon={<ContactsOutlinedIcon />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/admin/statistics"
-						title="Statistics"
-						to="/admin/statistics"
-						icon={<BarChartOutlinedIcon />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/admin/settings"
-						title="Settings"
-						to="/admin/settings"
-						icon={<Settings />}
+						key="/admin/generate-plan"
+						title="Generate Plan"
+						to="/admin/generate-plan"
+						icon={<NextPlan />}
 					/>
 				</Fragment>
 			),
@@ -87,41 +65,21 @@ const Sidebar = () => {
 			requiredRole: ['receptionist'],
 			element: (
 				<Fragment key="re">
+					<NavItem key="/reception" title="Dashboard" to="/reception" icon={<FaDashcube />} />
 					<NavItem
-						isCollapsed={isCollapsed}
-						key="/reception"
-						title="Dashboard"
-						to="/reception"
-						icon={<FaDashcube />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
 						key="/reception/patients"
 						title="Patients"
 						to="/reception/patients"
 						icon={<PersonSearch />}
 					/>
 					<NavItem
-						isCollapsed={isCollapsed}
 						key="/reception/add-patient"
 						title="Add Patient"
 						to="/reception/add-patient"
 						icon={<PersonAdd />}
 					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/reception/queue"
-						title="Queuing"
-						to="/reception/queue"
-						icon={<People />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/reception/payment"
-						title="Payment"
-						to="/reception/payment"
-						icon={<Money />}
-					/>
+					<NavItem key="/reception/queue" title="Queuing" to="/reception/queue" icon={<People />} />
+					<NavItem key="/reception/payment" title="Payment" to="/reception/payment" icon={<Money />} />
 				</Fragment>
 			),
 		},
@@ -129,27 +87,9 @@ const Sidebar = () => {
 			requiredRole: ['doctor'],
 			element: (
 				<Fragment key="do">
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/doctor"
-						title="Dashboard"
-						to="/doctor"
-						icon={<FaDashcube />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/doctor/patients"
-						title="Patient Room"
-						to="/doctor/patients"
-						icon={<People />}
-					/>
-					<NavItem
-						isCollapsed={isCollapsed}
-						key="/doctor/schedule"
-						title="Scheduling"
-						to="/doctor/schedule"
-						icon={<CalendarMonth />}
-					/>
+					<NavItem key="/doctor" title="Dashboard" to="/doctor" icon={<FaDashcube />} />
+					<NavItem key="/doctor/patients" title="Patient Room" to="/doctor/patients" icon={<People />} />
+					<NavItem key="/doctor/schedule" title="Scheduling" to="/doctor/schedule" icon={<CalendarMonth />} />
 				</Fragment>
 			),
 		},
@@ -194,15 +134,19 @@ const Sidebar = () => {
 				component="nav"
 				sx={{
 					display: 'flex',
-					alignItems: 'center',
+					alignItems: 'flex-start',
 					flexDirection: 'column',
-					justifyContent: 'center',
+					justifyContent: 'flex-start',
 					p: 0,
 					px: 2,
+					gap: 0.5,
 				}}
 			>
+				<Typography variant="h6" component="h2" color={colors.textBlue[500]} py={1}>
+					Menu
+				</Typography>
 				{navElements.map((nav) => {
-					if (nav.requiredRole.includes(user.r_data)) {
+					if (nav.requiredRole.includes(user.r_data) || nav.requiredRole.includes('none')) {
 						return nav.element;
 					}
 					return null;
@@ -212,14 +156,20 @@ const Sidebar = () => {
 					key="logout-link"
 					sx={{
 						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-						justifyContent: 'center',
-
+						flexDirection: 'row',
+						position: 'relative',
+						bottom: 0,
+						alignItems: 'flex-start',
+						justifyContent: 'left',
+						width: '100%',
+						borderRadius: '5px',
+						gap: 2,
+						p: 2,
 						'& .MuiListItemIcon-root': {
-							color: colors.black,
+							color: colors.textBlue[500],
 						},
-						[theme.breakpoints.up('xs')]: {
+
+						[theme.breakpoints.down('md')]: {
 							'& .MuiListItemIcon-root': {
 								fontSize: '12px',
 							},
@@ -237,11 +187,10 @@ const Sidebar = () => {
 					<ListItemIcon>
 						<Logout />
 					</ListItemIcon>
-					<Collapse in={!isCollapsed}>
-						<Typography variant="caption" color={colors.black}>
-							Logout
-						</Typography>
-					</Collapse>
+
+					<Typography variant="subtitle2" color={colors.textBlue[500]}>
+						Logout
+					</Typography>
 				</ListItemButton>
 			</List>
 			<ConfirmationModal
