@@ -1,7 +1,6 @@
 import {
 	Box,
 	Button,
-	Collapse,
 	IconButton,
 	ListItemButton,
 	ListItemIcon,
@@ -17,23 +16,10 @@ import { ColorModeContext, tokens } from '../../theme';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
-import { FaDashcube, FaUserDoctor } from 'react-icons/fa6';
+import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import {
-	Book,
-	CalendarMonth,
-	Logout,
-	MenuOutlined,
-	Money,
-	NextPlan,
-	Notifications,
-	People,
-	PersonAdd,
-	PersonSearch,
-	Settings,
-} from '@mui/icons-material';
+import { Book, CalendarMonth, Logout, MenuOutlined, NextPlan, Notifications } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { Link } from 'react-router-dom';
@@ -68,7 +54,7 @@ const Topbar = () => {
 	};
 	const navElements = [
 		{
-			requiredRole: ['none'],
+			requiredRole: ['vp'],
 			element: (
 				<Stack key="pres">
 					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
