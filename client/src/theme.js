@@ -8,36 +8,57 @@ export const tokens = (mode) => ({
 				white: '#000000',
 				black: '#c2c2c2',
 				grey: {
-					100: '#141414',
-					200: '#292929',
-					300: '#3d3d3d',
-					400: '#525252',
-					500: '#666666',
-					600: '#858585',
-					700: '#a3a3a3',
-					800: '#000000',
-					900: '#e0e0e0',
+					100: '#192b3f', // Darkest
+					200: '#3a4e66', // Transitioning to lighter grey
+					300: '#5b748d', // Further transition
+					400: '#7c9ab4', // Closer to main color
+					500: '#a8abad', // Main Color (unchanged)
+					600: '#b8b8c2', // Slightly Darker (lightly adjusted)
+					700: '#d0d0d5', // Medium Light (lightly adjusted)
+					800: '#e1e1e6', // Light Tint (lightened)
+					900: '#ffffff', // Very Light (unchanged)
 				},
-				primary: {
-					100: '#162A5C', // Darkest light shade
-					200: '#1A3A7A', // Darker still
-					300: '#1F4F99', // Darker shade
-					400: '#2A6BCC', // Base light mode color
-					500: '#4D8CFF', // Medium light
-					600: '#80B0FF', // Light
-					700: '#B3D6FF', // Lighter shade
-					800: '#E3EFFF', // Lightest shade
+				aastuBlue: {
+					100: '#b0c4de', // Light Tint (adjusted for dark mode)
+					200: '#8fa1cb', // Medium Light (adjusted for dark mode)
+					300: '#6f87b8', // Slightly Darker (adjusted for dark mode)
+					400: '#4e6da5', // Main Color (adjusted for visibility)
+					500: '#002951', // Main Color (same as light mode)
+					600: '#001e3c', // Darker Shade (same as light mode)
+					700: '#00152a', // Even Darker (same as light mode)
+					800: '#000c18', // Very Dark (same as light mode)
 				},
+				textBlue: {
+					100: '#0a121a', // Very Dark
+					200: '#101c27', // Even Darker
+					300: '#1a2635', // Darker Shade
+					400: '#273240', // Main Color
+					500: '#6f87b8', // Slightly Darker
+					600: '#8fa1cb', // Medium Light
+					700: '#b0c4de', // Light Tint
+					800: '#e0e7f1', // Very Light
+				},
+				aastuGold: {
+					100: '#fce6a8', // Light Tint (adjusted for dark mode)
+					200: '#f9d87c', // Medium Light (adjusted for dark mode)
+					300: '#f7c24f', // Slightly Darker (adjusted for dark mode)
+					400: '#f1c40f', // Main Color (same as light mode)
+					500: '#d4a10e', // Darker Shade (adjusted for visibility)
+					600: '#b78a0d', // Even Darker (adjusted for visibility)
+					700: '#9b6d0c', // Very Dark (adjusted for visibility)
+					800: '#7f580b', // Darker for very dark background
+				},
+
 				greenAccent: {
-					100: '#dbf5ee',
-					200: '#b7ebde',
-					300: '#94e2cd',
-					400: '#70d8bd',
-					500: '#4cceac',
-					600: '#3da58a',
-					700: '#2e7c67',
-					800: '#1e5245',
-					900: '#0f2922',
+					100: '#b7ebde', // Light Tint (adjusted for dark mode)
+					200: '#94e2cd', // Medium Light (adjusted for dark mode)
+					300: '#70d8bd', // Slightly Darker (adjusted for dark mode)
+					400: '#4cceac', // Main Color (same as light mode)
+					500: '#3da58a', // Darker Shade (adjusted for visibility)
+					600: '#2e7c67', // Even Darker (adjusted for visibility)
+					700: '#1e5245', // Very Dark (adjusted for visibility)
+					800: '#0f2922', // Darkest (same as light mode)
+					900: '#0a1c1a', // Darker for contrast
 				},
 				redAccent: {
 					100: '#f8dcdb',
@@ -50,49 +71,61 @@ export const tokens = (mode) => ({
 					800: '#58201e',
 					900: '#2c100f',
 				},
-				blueAccent: {
-					50: '#273240',
-					100: '#0a4356',
-					200: '#008cd5',
-					300: '#0a4356',
-					400: '#003f7d',
-					600: '#2c3e4e',
-				},
 			}
 		: {
 				white: '#ffffff',
 				black: '#000000',
 				grey: {
-					100: '#e0e0e0',
-					200: '#c2c2c2',
-					300: '#a3a3a3',
-					400: '#858585',
-					500: '#666666',
-					600: '#525252',
-					700: '#3d3d3d',
-					800: '#ededed',
-					900: '#141414',
+					100: '#ffffff', // Very Light
+					200: '#f1f2f7', // Light Tint
+					300: '#d9dbe2', // Medium Light
+					400: '#c0c3cf', // Slightly Darker
+					500: '#a8abbd', // Main Color
+					600: '#9094a9', // Darker Shade
+					700: '#787b95', // Even Darker
+					800: '#60627f', // Very Dark
+					900: '#484a6b', // Darkest
 				},
-				primary: {
-					100: '#E3EFFF', // Lightest shade
-					200: '#B3D6FF', // Light
-					300: '#80B0FF', // Medium light
-					400: '#4D8CFF', // Base light mode color
-					500: '#2A6BCC', // Slightly darker
-					600: '#1F4F99', // Darker shade
-					700: '#1A3A7A', // Darker still
-					800: '#162A5C', // Darkest light shade
+				aastuBlue: {
+					100: '#e0e7f1', // Very Light
+					200: '#b0c4de', // Light Tint
+					300: '#8fa1cb', // Medium Light
+					400: '#6f87b8', // Slightly Darker
+					500: '#002951', // Main Color
+					600: '#001e3c', // Darker Shade
+					700: '#00152a', // Even Darker
+					800: '#000c18', // Very Dark
+				},
+				textBlue: {
+					100: '#e0e7f1', // Very Light
+					200: '#b0c4de', // Light Tint
+					300: '#8fa1cb', // Medium Light
+					400: '#6f87b8', // Slightly Darker
+					500: '#273240', // Main Color
+					600: '#1a2635', // Darker Shade
+					700: '#101c27', // Even Darker
+					800: '#0a121a', // Very Dark
+				},
+				aastuGold: {
+					100: '#fef5d4', // Very Light
+					200: '#fce6a8', // Light Tint
+					300: '#f9d87c', // Medium Light
+					400: '#f7c24f', // Slightly Darker
+					500: '#f1c40f', // Main Color
+					600: '#d4a10e', // Darker Shade
+					700: '#b78a0d', // Even Darker
+					800: '#9b6d0c', // Very Dark
 				},
 				greenAccent: {
-					100: '#0f2922',
-					200: '#1e5245',
-					300: '#2e7c67',
-					400: '#3da58a',
-					500: '#4cceac',
-					600: '#70d8bd',
-					700: '#94e2cd',
-					800: '#b7ebde',
-					900: '#dbf5ee',
+					100: '#dbf5ee', // Very Light
+					200: '#b7ebde', // Light Tint
+					300: '#94e2cd', // Medium Light
+					400: '#70d8bd', // Slightly Darker
+					500: '#4cceac', // Main Color
+					600: '#3da58a', // Darker Shade
+					700: '#2e7c67', // Even Darker
+					800: '#1e5245', // Very Dark
+					900: '#0f2922', // Darkest
 				},
 				redAccent: {
 					100: '#2c100f',
@@ -104,14 +137,6 @@ export const tokens = (mode) => ({
 					700: '#e99592',
 					800: '#f1b9b7',
 					900: '#f8dcdb',
-				},
-				blueAccent: {
-					50: '#BFE0FF',
-					100: '#55ddee',
-					200: '#0088de',
-					300: '#55ddee',
-					400: '#0083FC',
-					600: '#76AACA',
 				},
 			}),
 });
@@ -134,7 +159,7 @@ export const themeSettings = (mode) => {
 			MuiButton: {
 				styleOverrides: {
 					root: {
-						borderRadius: '20px',
+						borderRadius: '5px',
 						'&:disabled': {
 							cursor: 'not-allowed',
 							pointerEvents: 'all !important',
@@ -142,7 +167,7 @@ export const themeSettings = (mode) => {
 					},
 
 					contained: {
-						background: `linear-gradient(to right, ${colors.blueAccent[100]}  0%, ${colors.blueAccent[200]}  80%)`,
+						background: colors.aastuBlue[500],
 						color: 'white',
 						'&:disabled': {
 							background: colors.grey[800],
@@ -154,11 +179,11 @@ export const themeSettings = (mode) => {
 					},
 
 					outlined: {
-						border: `1px solid ${colors.blueAccent[200]}`,
-						color: `${colors.blueAccent[200]}`,
+						border: `1px solid ${colors.aastuBlue[500]}`,
+						color: `${colors.aastuBlue[500]}`,
 						'&:hover': {
-							border: `1px solid ${colors.primary[600]}`,
-							color: `${colors.primary[600]}`,
+							border: `1px solid ${colors.aastuBlue[600]}`,
+							color: `${colors.aastuBlue[600]}`,
 						},
 					},
 					outlinedError: {
@@ -170,7 +195,7 @@ export const themeSettings = (mode) => {
 						color: '#FF3131',
 					},
 					text: {
-						color: `${colors.blueAccent[200]}`,
+						color: `${colors.aastuBlue[500]}`,
 					},
 				},
 			},
@@ -179,7 +204,7 @@ export const themeSettings = (mode) => {
 				styleOverrides: {
 					root: {
 						backgroundColor: `${colors.grey[100]}`,
-						borderRadius: '20px',
+						borderRadius: '5px',
 					},
 				},
 			},
@@ -189,7 +214,7 @@ export const themeSettings = (mode) => {
 						backgroundColor: `${colors.grey[100]}`,
 					},
 					'&.Mui-selected': {
-						backgroundColor: `${colors.blueAccent[500]}`,
+						backgroundColor: `${colors.aastuBlue[500]}`,
 						color: `${colors.white}`,
 					},
 				},
@@ -207,71 +232,50 @@ export const themeSettings = (mode) => {
 				main: '#FF3131',
 			},
 			mode: mode,
-			...(mode === 'dark'
-				? {
-						// palette values for dark mode
-						primary: {
-							main: colors.blueAccent[200],
-						},
-						secondary: {
-							main: colors.greenAccent[500],
-						},
-						neutral: {
-							dark: colors.grey[700],
-							main: colors.grey[500],
-							light: colors.grey[100],
-						},
-						background: {
-							default: colors.primary[500],
-						},
-					}
-				: {
-						// palette values for light mode
-						primary: {
-							main: colors.blueAccent[200],
-						},
-						secondary: {
-							main: colors.greenAccent[500],
-						},
-						neutral: {
-							dark: colors.grey[700],
-							main: colors.grey[500],
-							light: colors.grey[100],
-						},
-						background: {
-							default: colors.grey[800],
-						},
-					}),
+			primary: {
+				main: colors.aastuBlue[500],
+			},
+			secondary: {
+				main: colors.aastuGold[500],
+			},
+			neutral: {
+				dark: colors.grey[700],
+				main: colors.grey[200],
+				light: colors.grey[100],
+			},
+			background: {
+				default: colors.aastuBlue[600],
+			},
 		},
 		typography: {
-			fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+			fontFamily: ['Poppins', 'sans-serif'].join(','),
 			fontSize: 12,
 			h1: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 40,
 			},
 			h2: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 32,
 			},
 			h3: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 24,
 			},
 			h4: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 20,
 			},
 			h5: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 16,
 			},
 			h6: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 14,
 			},
 			caption: {
-				fontFamily: ['Tenor Sans', 'sans-serif'].join(','),
+				fontFamily: ['Poppins', 'sans-serif'].join(','),
 				fontSize: 10,
 			},
 		},
