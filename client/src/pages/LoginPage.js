@@ -37,7 +37,7 @@ function LoginPage() {
 			}}
 		>
 			<Stack
-				bgcolor={colors.grey[100]}
+				bgcolor={colors.grey[200]}
 				boxShadow={5}
 				direction="row"
 				display="flex"
@@ -47,11 +47,12 @@ function LoginPage() {
 				height="60%"
 				borderRadius="5px"
 				p={4}
+				py={5}
 				gap={1}
 			>
 				<Stack direction="column" display="flex" justifyContent="center" alignItems="center">
 					<img src={AASTULogo} alt="Not Found" style={{ maxHeight: '150px', width: '40%', height: 'auto' }} />
-					<Typography color={colors.textBlue[500]} variant="h4" component="h1" fontWeight="bold">
+					<Typography color={colors.aastuBlue[500]} variant="h4" component="h1" fontWeight="bold">
 						Strategic Planning Management System
 					</Typography>
 				</Stack>
@@ -75,7 +76,7 @@ function LoginPage() {
 				>
 					<Stack direction="row" display="flex" justifyContent="center" alignItems="center" gap={2}>
 						<Person />
-						<Typography color={colors.textBlue[500]} variant="h4" component="h1" fontWeight="bold">
+						<Typography color={colors.aastuBlue[500]} variant="h4" component="h1" fontWeight="bold">
 							Login
 						</Typography>
 					</Stack>
