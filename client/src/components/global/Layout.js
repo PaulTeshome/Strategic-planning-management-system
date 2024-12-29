@@ -5,11 +5,9 @@ import MyContext from '../../utils/MyContext';
 import Sidebar from './Sidebar';
 import { Box, Stack } from '@mui/material';
 import Topbar from './Topbar';
-// import SkeletonLoader from '../SkeletonLoader';
 import { useTheme } from '@emotion/react';
 import { Toaster } from 'react-hot-toast';
 // import withAuth from '../../utils/withAuth';
-import SmallLoader from '../SmallLoader';
 import NotFound from '../../pages/NotFound';
 import Loader from '../Loader';
 
