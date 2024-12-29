@@ -1,6 +1,8 @@
 import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { ColorModeContext, tokens, useMode } from './theme';
 import Layout from './components/global/Layout';
+import lightBG from './assets/theme=light.svg';
+import darkBG from './assets/theme=dark.svg';
 
 function App() {
 	const [theme, colorMode] = useMode();
@@ -16,7 +18,8 @@ function App() {
 					sx={{
 						height: '100vh',
 						overflow: 'hidden',
-
+						backgroundImage: theme.palette.mode === 'light' ? `url(${lightBG})` : `url(${darkBG})`,
+						backgroundSize: '314px 200px',
 						[theme.breakpoints.up('xs')]: {
 							flexDirection: 'column-reverse',
 						},
