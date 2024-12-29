@@ -126,7 +126,7 @@ const Sidebar = () => {
 				maxHeight={65}
 			>
 				<img src={AASTULogoCircle} alt="aastu logo" width="30px" height="30px" />
-				<Typography variant="h5" component="h1" fontWeight="bold" color={colors.textBlue[500]}>
+				<Typography variant="h5" component="h1" fontWeight="bold" color={colors.aastuBlue[500]}>
 					SPMS
 				</Typography>
 			</Stack>
@@ -142,7 +142,7 @@ const Sidebar = () => {
 					gap: 0.5,
 				}}
 			>
-				<Typography variant="h6" component="h2" color={colors.textBlue[500]} py={1}>
+				<Typography variant="h6" component="h2" color={colors.aastuBlue[500]} py={1}>
 					Menu
 				</Typography>
 				{navElements.map((nav) => {
@@ -166,7 +166,7 @@ const Sidebar = () => {
 						gap: 2,
 						p: 2,
 						'& .MuiListItemIcon-root': {
-							color: colors.textBlue[500],
+							color: colors.aastuBlue[500],
 						},
 
 						[theme.breakpoints.down('md')]: {
@@ -188,7 +188,7 @@ const Sidebar = () => {
 						<Logout />
 					</ListItemIcon>
 
-					<Typography variant="subtitle2" color={colors.textBlue[500]}>
+					<Typography variant="subtitle2" color={colors.aastuBlue[500]}>
 						Logout
 					</Typography>
 				</ListItemButton>

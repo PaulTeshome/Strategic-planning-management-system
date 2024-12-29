@@ -22,7 +22,7 @@ function NavItem({ title, to, icon, isCollapsed }) {
 				p: 2,
 
 				'& .MuiListItemIcon-root': {
-					color: location.pathname === to ? colors.aastuBlue[700] : colors.textBlue[500],
+					color: location.pathname === to ? colors.aastuBlue[700] : colors.aastuBlue[500],
 				},
 				[theme.breakpoints.down('md')]: {
 					'& .MuiListItemIcon-root': {
@@ -49,7 +49,7 @@ function NavItem({ title, to, icon, isCollapsed }) {
 			</ListItemIcon>
 			<Typography
 				variant="subtitle2"
-				color={location.pathname === to ? colors.aastuBlue[700] : colors.textBlue[500]}
+				color={location.pathname === to ? colors.aastuBlue[700] : colors.aastuBlue[500]}
 			>
 				{title}
 			</Typography>
