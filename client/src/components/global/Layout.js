@@ -11,6 +11,7 @@ import { Toaster } from 'react-hot-toast';
 // import withAuth from '../../utils/withAuth';
 import SmallLoader from '../SmallLoader';
 import NotFound from '../../pages/NotFound';
+import Loader from '../Loader';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 
@@ -44,31 +45,11 @@ function Layout() {
 
 	const appRoutes = [
 		{
-			element: (
-				<Route
-					key="/login-path"
-					path="/login"
-					element={
-						<Suspense fallback={<SmallLoader />}>
-							<Login />
-						</Suspense>
-					}
-				/>
-			),
+			element: <Route key="/login-path" path="/login" element={<Login />} />,
 			requiredRole: ['none'],
 		},
 		{
-			element: (
-				<Route
-					key="/admin-dash"
-					path={dashboard}
-					element={
-						<Suspense fallback={<SmallLoader />}>
-							<Login />
-						</Suspense>
-					}
-				/>
-			),
+			element: <Route key="/admin-dash" path={dashboard} element={<Login />} />,
 			requiredRole: ['none'],
 		},
 	];
@@ -78,16 +59,18 @@ function Layout() {
 			{shouldRenderSidebar && <Sidebar isSidebar={isSidebar} />}
 			<Stack component="main" direction="column" className="content">
 				{shouldRenderSidebar && <Topbar setIsSidebar={setIsSidebar} />}
-				<Box sx={{ height: 'fit-content', overflow: 'auto' }}>
-					<Routes>
-						{appRoutes.map((route) => {
-							if (route.requiredRole.includes(user.r_data) || route.requiredRole.includes('none')) {
-								return route.element;
-							}
-							return null;
-						})}
-						<Route path="*" element={<NotFound />} />
-					</Routes>
+				<Box sx={{ height: 'stretch', overflow: 'auto' }}>
+					<Suspense fallback={<Loader />}>
+						<Routes>
+							{appRoutes.map((route) => {
+								if (route.requiredRole.includes(user.r_data) || route.requiredRole.includes('none')) {
+									return route.element;
+								}
+								return null;
+							})}
+							<Route path="*" element={<NotFound />} />
+						</Routes>
+					</Suspense>
 				</Box>
 				<Toaster
 					position="top-center"
