@@ -19,6 +19,7 @@ body,
 .app {
 	display: flex;
 	position: relative;
+	color-scheme: light dark;
 }
 
 ::-webkit-scrollbar {
