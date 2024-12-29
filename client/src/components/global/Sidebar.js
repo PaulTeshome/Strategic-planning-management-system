@@ -4,7 +4,7 @@ import { tokens } from '../../theme';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import { Book, CalendarMonth, Logout, Money, NextPlan, People, PersonAdd, PersonSearch } from '@mui/icons-material';
+import { Book, CalendarMonth, Logout, NextPlan } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useLogout from '../../hooks/useLogout';
@@ -34,49 +34,11 @@ const Sidebar = () => {
 			requiredRole: ['none'],
 			element: (
 				<Fragment key="pres">
-					<NavItem key="/admin/" title="Dashboard" to="/admin/" icon={<FaDashcube />} />
-					<NavItem key="/admin/plan" title="Plan" to="/admin/plan" icon={<Book />} />
-					<NavItem key="/admin/report" title="Report" to="/admin/report" icon={<BarChartOutlinedIcon />} />
-					<NavItem key="/admin/schedule" title="Schedule" to="/admin/schedule" icon={<CalendarMonth />} />
-					<NavItem
-						key="/admin/generate-plan"
-						title="Generate Plan"
-						to="/admin/generate-plan"
-						icon={<NextPlan />}
-					/>
-				</Fragment>
-			),
-		},
-
-		{
-			requiredRole: ['receptionist'],
-			element: (
-				<Fragment key="re">
-					<NavItem key="/reception" title="Dashboard" to="/reception" icon={<FaDashcube />} />
-					<NavItem
-						key="/reception/patients"
-						title="Patients"
-						to="/reception/patients"
-						icon={<PersonSearch />}
-					/>
-					<NavItem
-						key="/reception/add-patient"
-						title="Add Patient"
-						to="/reception/add-patient"
-						icon={<PersonAdd />}
-					/>
-					<NavItem key="/reception/queue" title="Queuing" to="/reception/queue" icon={<People />} />
-					<NavItem key="/reception/payment" title="Payment" to="/reception/payment" icon={<Money />} />
-				</Fragment>
-			),
-		},
-		{
-			requiredRole: ['doctor'],
-			element: (
-				<Fragment key="do">
-					<NavItem key="/doctor" title="Dashboard" to="/doctor" icon={<FaDashcube />} />
-					<NavItem key="/doctor/patients" title="Patient Room" to="/doctor/patients" icon={<People />} />
-					<NavItem key="/doctor/schedule" title="Scheduling" to="/doctor/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
+					<NavItem key="/vp/plan" title="Plan" to="/vp/plan" icon={<Book />} />
+					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
+					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
 				</Fragment>
 			),
 		},

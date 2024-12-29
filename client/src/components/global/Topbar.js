@@ -4,6 +4,7 @@ import {
 	Collapse,
 	IconButton,
 	ListItemButton,
+	ListItemIcon,
 	Menu,
 	MenuItem,
 	Stack,
@@ -21,10 +22,12 @@ import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube, FaUserDoctor } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
 import {
+	Book,
 	CalendarMonth,
 	Logout,
 	MenuOutlined,
 	Money,
+	NextPlan,
 	Notifications,
 	People,
 	PersonAdd,
@@ -63,60 +66,16 @@ const Topbar = () => {
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
-
 	const navElements = [
 		{
-			requiredRole: ['admin'],
+			requiredRole: ['none'],
 			element: (
-				<Stack direction="column" p={0} key="ad">
-					<NavItem key="/admin/" title="Dashboard" to="/admin/" icon={<FaDashcube />} />
-					<NavItem key="/admin/doctors" title="Doctors" to="/admin/doctors" icon={<FaUserDoctor />} />
-					<NavItem
-						key="/admin/receptionists"
-						title="Receptionsts"
-						to="/admin/receptionists"
-						icon={<ContactsOutlinedIcon />}
-					/>
-					<NavItem
-						key="/admin/statistics"
-						title="Statistics"
-						to="/admin/statistics"
-						icon={<BarChartOutlinedIcon />}
-					/>
-					<NavItem key="/admin/settings" title="Settings" to="/admin/settings" icon={<Settings />} />
-				</Stack>
-			),
-		},
-
-		{
-			requiredRole: ['receptionist'],
-			element: (
-				<Stack direction="column" p={0} key="re">
-					<NavItem key="/reception" title="Dashboard" to="/reception" icon={<FaDashcube />} />
-					<NavItem
-						key="/reception/patients"
-						title="Patients"
-						to="/reception/patients"
-						icon={<PersonSearch />}
-					/>
-					<NavItem
-						key="/reception/add-patient"
-						title="Add Patient"
-						to="/reception/add-patient"
-						icon={<PersonAdd />}
-					/>
-					<NavItem key="/reception/queue" title="Queuing" to="/reception/queue" icon={<People />} />
-					<NavItem key="/reception/payment" title="Payment" to="/reception/payment" icon={<Money />} />
-				</Stack>
-			),
-		},
-		{
-			requiredRole: ['doctor'],
-			element: (
-				<Stack direction="column" p={0} key="do">
-					<NavItem key="/doctor" title="Dashboard" to="/doctor" icon={<FaDashcube />} />
-					<NavItem key="/doctor/patients" title="Patient Room" to="/doctor/patients" icon={<People />} />
-					<NavItem key="/doctor/schedule" title="Scheduling" to="/doctor/schedule" icon={<CalendarMonth />} />
+				<Stack key="pres">
+					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
+					<NavItem key="/vp/plan" title="Plan" to="/vp/plan" icon={<Book />} />
+					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
+					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
 				</Stack>
 			),
 		},
@@ -161,7 +120,13 @@ const Topbar = () => {
 							aria-haspopup="true"
 							aria-expanded={open ? 'true' : undefined}
 							onClick={handleClick}
-							sx={{ p: 0, margin: 0 }}
+							sx={{
+								p: 0,
+								margin: 0,
+								'& .MuiSvgIcon-root': {
+									color: colors.textBlue[500],
+								},
+							}}
 						>
 							<MenuOutlined />
 						</Button>
@@ -182,7 +147,7 @@ const Topbar = () => {
 							}}
 						>
 							{navElements.map((nav, index) => {
-								if (nav.requiredRole.includes(user.r_data)) {
+								if (nav.requiredRole.includes(user.r_data) || nav.requiredRole.includes('none')) {
 									return (
 										<MenuItem sx={{ p: 0.5 }} key={index} onClick={handleClose}>
 											{nav.element}
@@ -191,19 +156,26 @@ const Topbar = () => {
 								}
 								return null;
 							})}
+
 							<MenuItem key="logout" onClick={handleClose}>
 								<ListItemButton
+									key="logout-link"
 									sx={{
 										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'center',
-										justifyContent: 'center',
-										p: 1,
-
+										flexDirection: 'row',
+										position: 'relative',
+										bottom: 0,
+										alignItems: 'flex-start',
+										justifyContent: 'left',
+										width: '100%',
+										borderRadius: '5px',
+										gap: 2,
+										p: 2,
 										'& .MuiListItemIcon-root': {
-											color: colors.black,
+											color: colors.aastuBlue[500],
 										},
-										[theme.breakpoints.up('xs')]: {
+
+										[theme.breakpoints.down('md')]: {
 											'& .MuiListItemIcon-root': {
 												fontSize: '12px',
 											},
@@ -218,13 +190,13 @@ const Topbar = () => {
 										setOpenLogout(true);
 									}}
 								>
-									<Logout />
+									<ListItemIcon>
+										<Logout />
+									</ListItemIcon>
 
-									<Collapse in={true}>
-										<Typography variant="caption" color={colors.black}>
-											Logout
-										</Typography>
-									</Collapse>
+									<Typography variant="subtitle2" color={colors.aastuBlue[500]}>
+										Logout
+									</Typography>
 								</ListItemButton>
 							</MenuItem>
 						</Menu>
