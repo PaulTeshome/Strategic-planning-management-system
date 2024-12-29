@@ -19,7 +19,7 @@ function App() {
 						height: '100vh',
 						overflow: 'hidden',
 						backgroundImage: theme.palette.mode === 'light' ? `url(${lightBG})` : `url(${darkBG})`,
-						backgroundSize: '314px 200px',
+						backgroundSize: '313.1px 200px',
 						[theme.breakpoints.up('xs')]: {
 							flexDirection: 'column-reverse',
 						},
