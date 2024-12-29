@@ -1,12 +1,11 @@
 import { Box, CssBaseline, ThemeProvider } from '@mui/material';
-import { ColorModeContext, tokens, useMode } from './theme';
+import { ColorModeContext, useMode } from './theme';
 import Layout from './components/global/Layout';
 import lightBG from './assets/theme=light.svg';
 import darkBG from './assets/theme=dark.svg';
 
 function App() {
 	const [theme, colorMode] = useMode();
-	const colors = tokens(theme.palette.mode);
 
 	return (
 		<ColorModeContext.Provider value={colorMode}>
