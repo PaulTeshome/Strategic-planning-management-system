@@ -83,7 +83,7 @@ function Layout() {
 					toastOptions={{
 						duration: 3000,
 						style: {
-							borderRadius: '20px',
+							borderRadius: '5px',
 							minWidth: '150px',
 						},
 						success: {
@@ -94,7 +94,7 @@ function Layout() {
 						},
 						error: {
 							style: {
-								background: colors.redAccent[800],
+								background: colors.redAccent[700],
 								color: colors.black,
 							},
 						},
