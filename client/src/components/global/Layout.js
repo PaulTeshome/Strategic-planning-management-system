@@ -1,14 +1,14 @@
 import { lazy, Suspense, useContext, useState } from 'react';
 import { tokens } from '../../theme';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import MyContext from '../../utils/MyContext';
 import Sidebar from './Sidebar';
 import { Box, Stack } from '@mui/material';
 import Topbar from './Topbar';
-import SkeletonLoader from '../SkeletonLoader';
+// import SkeletonLoader from '../SkeletonLoader';
 import { useTheme } from '@emotion/react';
 import { Toaster } from 'react-hot-toast';
-import withAuth from '../../utils/withAuth';
+// import withAuth from '../../utils/withAuth';
 import SmallLoader from '../SmallLoader';
 import NotFound from '../../pages/NotFound';
 
@@ -48,6 +48,20 @@ function Layout() {
 				<Route
 					key="/login-path"
 					path="/login"
+					element={
+						<Suspense fallback={<SmallLoader />}>
+							<Login />
+						</Suspense>
+					}
+				/>
+			),
+			requiredRole: ['none'],
+		},
+		{
+			element: (
+				<Route
+					key="/admin-dash"
+					path={dashboard}
 					element={
 						<Suspense fallback={<SmallLoader />}>
 							<Login />

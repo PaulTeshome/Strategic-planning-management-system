@@ -1,23 +1,10 @@
 import { Fragment, useContext, useState } from 'react';
-import { Box, Collapse, List, ListItemButton, ListItemIcon, Stack, Typography, useTheme } from '@mui/material';
+import { Box, List, ListItemButton, ListItemIcon, Stack, Typography, useTheme } from '@mui/material';
 import { tokens } from '../../theme';
-import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
-import { FaDashcube, FaUserDoctor } from 'react-icons/fa6';
+import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import {
-	Book,
-	CalendarMonth,
-	ChatRounded,
-	Logout,
-	MenuOutlined,
-	Money,
-	NextPlan,
-	People,
-	PersonAdd,
-	PersonSearch,
-	Settings,
-} from '@mui/icons-material';
+import { Book, CalendarMonth, Logout, Money, NextPlan, People, PersonAdd, PersonSearch } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useLogout from '../../hooks/useLogout';
