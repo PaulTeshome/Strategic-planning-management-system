@@ -23,7 +23,7 @@ function ConfirmationModal({ open, onConfirm, onCancel, title, message, color })
 			open={open}
 			onClose={onCancel}
 		>
-			<DialogTitle sx={{ fontSize: '16px', fontWeight: 'bold', color: colors.blueAccent[200] }}>
+			<DialogTitle sx={{ fontSize: '16px', fontWeight: 'bold', color: colors.aastuBlue[500] }}>
 				{title}
 			</DialogTitle>
 			<DialogContent>

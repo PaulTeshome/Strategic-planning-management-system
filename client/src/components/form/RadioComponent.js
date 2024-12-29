@@ -29,7 +29,7 @@ function RadioComponent({ touched, error, label, name, value, onChange, onBlur, 
 							<Radio
 								sx={{
 									'&.Mui-checked': {
-										color: colors.blueAccent[200],
+										color: colors.aastuBlue[200],
 									},
 								}}
 							/>

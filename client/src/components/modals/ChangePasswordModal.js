@@ -38,13 +38,13 @@ function ChangePasswordModal({ open, onCancel }) {
 			open={open}
 			onClose={onCancel}
 		>
-			<DialogTitle sx={{ fontSize: '16px', fontWeight: 'bold', color: colors.blueAccent[200] }}>
+			<DialogTitle sx={{ fontSize: '16px', fontWeight: 'bold', color: colors.aastuBlue[200] }}>
 				Change your password
 			</DialogTitle>
 			<DialogContent>
 				<Grid
 					container
-					borderRadius="20px"
+					borderRadius="5px"
 					bgcolor={colors.white}
 					p={4}
 					my={2}

@@ -15,7 +15,7 @@ function InfoToast({ message }) {
 			justifyContent="flex-start"
 			gap={1}
 			p={1.3}
-			borderRadius="20px"
+			borderRadius="5px"
 			minWidth="150px"
 			bgcolor={colors.primary[200]}
 			color={colors.black}

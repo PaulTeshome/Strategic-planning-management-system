@@ -8,7 +8,7 @@ function DataGridWrapper({ children }) {
 	const colors = tokens(theme.palette.mode);
 	return (
 		<Box
-			borderRadius="20px"
+			borderRadius="5px"
 			bgcolor={colors.white}
 			p={{ xs: 2, md: 4 }}
 			height="75vh"
@@ -41,7 +41,7 @@ function DataGridWrapper({ children }) {
 					color: `${colors.greenAccent[200]} !important`,
 				},
 				'& .MuiDataGrid-toolbarContainer .MuiButton-text': {
-					color: `${colors.blueAccent[200]} !important`,
+					color: `${colors.aastuBlue[200]} !important`,
 				},
 			}}
 		>
