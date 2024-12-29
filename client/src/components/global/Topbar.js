@@ -25,6 +25,7 @@ import {
 	Logout,
 	MenuOutlined,
 	Money,
+	Notifications,
 	People,
 	PersonAdd,
 	PersonSearch,
@@ -241,10 +242,13 @@ const Topbar = () => {
 						{theme.palette.mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
 					</IconButton>
 
+					<IconButton component={Link} to="/notifications">
+						<Notifications />
+					</IconButton>
 					<IconButton component={Link} to="/profile">
 						<PersonOutlinedIcon />
 					</IconButton>
-					<Typography variant="body1" color={colors.aastuBlue[200]} mx={1}>
+					<Typography variant="body1" color={colors.textBlue[500]} mx={1}>
 						{user.user_name}
 					</Typography>
 				</Box>
