@@ -1,6 +1,6 @@
 import { lazy, Suspense, useContext, useState } from 'react';
 import { tokens } from '../../theme';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import MyContext from '../../utils/MyContext';
 import Sidebar from './Sidebar';
 import { Box, Stack } from '@mui/material';
@@ -10,8 +10,14 @@ import { Toaster } from 'react-hot-toast';
 // import withAuth from '../../utils/withAuth';
 import NotFound from '../../pages/NotFound';
 import Loader from '../Loader';
+import MainHolder from './MainHolder';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
+const VPDashboard = lazy(() => import('../../pages/president/VPDashboard'));
+const VPGenerate = lazy(() => import('../../pages/president/VPGenerate'));
+const VPplan = lazy(() => import('../../pages/president/VPplan'));
+const VPReport = lazy(() => import('../../pages/president/VPReport'));
+const VPSchedule = lazy(() => import('../../pages/president/VPSchedule'));
 
 function Layout() {
 	const theme = useTheme();
@@ -28,13 +34,13 @@ function Layout() {
 	let dashboard = null;
 
 	switch (user.r_data) {
-		case 'admin':
+		case 'president':
 			dashboard = '/vp';
 			break;
-		case 'receptionist':
+		case 'strategic':
 			dashboard = '/strategic';
 			break;
-		case 'doctor':
+		case 'offices':
 			dashboard = '/office';
 			break;
 		default:
@@ -47,7 +53,19 @@ function Layout() {
 			requiredRole: ['none'],
 		},
 		{
-			element: <Route key="/admin-dash" path={dashboard} element={<Login />} />,
+			element: <Route exact key="/redirect-path" path="/" element={<Navigate to={dashboard} />} />,
+			requiredRole: ['none'],
+		},
+		{
+			element: (
+				<Route key="/president-path" path="/vp" element={<MainHolder />}>
+					<Route index element={<VPDashboard />} />
+					<Route path="plan" element={<VPplan />} />
+					<Route path="report" element={<VPReport />} />
+					<Route path="schedule" element={<VPSchedule />} />
+					<Route path="generate-plan" element={<VPGenerate />} />
+				</Route>
+			),
 			requiredRole: ['none'],
 		},
 	];
