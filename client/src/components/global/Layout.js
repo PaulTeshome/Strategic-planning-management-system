@@ -8,11 +8,11 @@ import Topbar from './Topbar';
 import { useTheme } from '@emotion/react';
 import { Toaster } from 'react-hot-toast';
 // import withAuth from '../../utils/withAuth';
-import NotFound from '../../pages/NotFound';
 import Loader from '../Loader';
 import MainHolder from './MainHolder';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
+const NotFound = lazy(() => import('../../pages/NotFound'));
 const VPDashboard = lazy(() => import('../../pages/president/VPDashboard'));
 const VPGenerate = lazy(() => import('../../pages/president/VPGenerate'));
 const VPplan = lazy(() => import('../../pages/president/VPplan'));
@@ -61,12 +61,13 @@ function Layout() {
 				<Route key="/president-path" path="/vp" element={<MainHolder />}>
 					<Route index element={<VPDashboard />} />
 					<Route path="plan" element={<VPplan />} />
+					<Route path="plan/:plan_id" element={<VPplan />} />
 					<Route path="report" element={<VPReport />} />
 					<Route path="schedule" element={<VPSchedule />} />
 					<Route path="generate-plan" element={<VPGenerate />} />
 				</Route>
 			),
-			requiredRole: ['none'],
+			requiredRole: ['vp'],
 		},
 	];
 
