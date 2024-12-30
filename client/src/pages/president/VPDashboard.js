@@ -108,19 +108,19 @@ function VPDashboard() {
 				gap={2}
 			>
 				<StatCard
-					icon={<Book sx={{ fontSize: '50px', color: colors.textBlue[500] }} />}
+					icon={<Book sx={{ fontSize: '50px', color: colors.aastuGold[500] }} />}
 					title="Total Plans"
 					data="10"
 				/>
 				<Divider orientation="vertical" />
 				<StatCard
-					icon={<Book sx={{ fontSize: '50px', color: colors.textBlue[500] }} />}
+					icon={<Book sx={{ fontSize: '50px', color: colors.aastuGold[500] }} />}
 					title="Total Plans"
 					data="10"
 				/>
 				<Divider orientation="vertical" />
 				<StatCard
-					icon={<Book sx={{ fontSize: '50px', color: colors.textBlue[500] }} />}
+					icon={<Book sx={{ fontSize: '50px', color: colors.aastuGold[500] }} />}
 					title="Total Plans"
 					data="10"
 				/>
@@ -132,7 +132,7 @@ function VPDashboard() {
 				bgcolor={colors.grey[100]}
 				width="100%"
 				height="fit-content"
-				maxHeight={430}
+				minHeight={430}
 				borderRadius="5px"
 				boxShadow={5}
 				p={1}
