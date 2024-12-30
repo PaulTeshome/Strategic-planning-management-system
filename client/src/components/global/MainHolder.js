@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom';
 function MainHolder() {
 	const scrollContainerRef = useRef(null);
 	return (
-		<Box ref={scrollContainerRef} width="100%" height="fit-content" pt={3} px={1}>
+		<Box ref={scrollContainerRef} width="100%" height="stretch" pt={3} px={1}>
 			<Outlet />
 		</Box>
 	);
