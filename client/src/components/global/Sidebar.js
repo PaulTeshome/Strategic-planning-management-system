@@ -12,8 +12,8 @@ import AASTULogoCircle from '../../assets/AASTU_Logo_circle.png';
 
 const Sidebar = () => {
 	const theme = useTheme();
-
 	const colors = tokens(theme.palette.mode);
+
 	const { user } = useContext(MyContext);
 	const logOut = useLogout();
 
@@ -50,7 +50,7 @@ const Sidebar = () => {
 				alignItems: 'center',
 				justifyContent: 'center',
 				height: '100vh',
-				width: '16.67%',
+				width: '17%',
 				backgroundColor: colors.grey[200],
 				'& .Mui-selected': {
 					backgroundColor: 'transparent',
