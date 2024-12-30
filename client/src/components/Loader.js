@@ -17,7 +17,7 @@ function Loader() {
 				width="100px"
 				height="100px"
 				borderRadius={999}
-				bgcolor={colors.grey[100]}
+				bgcolor={colors.grey[200]}
 			>
 				<img src={AASTULogoCircle} className="animated-logo" alt="AASTU logo" width="80px" height="80px" />
 			</Box>
