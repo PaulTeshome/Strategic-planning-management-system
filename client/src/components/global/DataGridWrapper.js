@@ -10,8 +10,9 @@ function DataGridWrapper({ children }) {
 		<Box
 			borderRadius="5px"
 			bgcolor={colors.white}
-			p={{ xs: 2, md: 4 }}
-			height="75vh"
+			p={{ xs: 2, md: 3 }}
+			// height="75vh"
+			height="stretch"
 			width="100%"
 			sx={{
 				overflowX: 'auto',
@@ -19,7 +20,12 @@ function DataGridWrapper({ children }) {
 					border: 'none',
 				},
 				'& .MuiDataGrid-columnHeader': {
-					backgroundColor: colors.primary[100],
+					backgroundColor: colors.textBlue[500],
+					color: colors.grey[200],
+
+					'& .MuiSvgIcon-root': {
+						color: `${colors.grey[100]} !important`,
+					},
 				},
 				'& .MuiDataGrid-cell': {
 					borderBottom: 'none',
@@ -34,14 +40,14 @@ function DataGridWrapper({ children }) {
 				},
 
 				'& .MuiDataGrid-virtualScroller': {
-					backgroundColor: colors.primary[100],
+					backgroundColor: colors.grey[500],
 				},
 
 				'& .MuiCheckbox-root': {
 					color: `${colors.greenAccent[200]} !important`,
 				},
 				'& .MuiDataGrid-toolbarContainer .MuiButton-text': {
-					color: `${colors.aastuBlue[200]} !important`,
+					color: `${colors.textBlue[500]} !important`,
 				},
 			}}
 		>
