@@ -11,6 +11,11 @@ export const loginSchema = yup.object().shape({
 	password: yup.string().required('Password is required'),
 });
 
+export const vpPlanSchema = yup.object().shape({
+	year: yup.number().required('Year is required'),
+	department: yup.string().required('Department is required'),
+});
+
 export const scheduleSchema = yup.object().shape({
 	schedule_date: yup.date().typeError('Please specify a valid date!').required('required!'),
 });
