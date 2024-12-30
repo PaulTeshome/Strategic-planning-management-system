@@ -3,7 +3,7 @@ import React from 'react';
 
 function StatCard({ icon, title, data }) {
 	return (
-		<Stack direction="row" gap={2}>
+		<Stack direction="row" gap={1}>
 			{icon}
 			<Stack direction="column">
 				<Typography variant="h3" component="p" fontWeight="bold">
