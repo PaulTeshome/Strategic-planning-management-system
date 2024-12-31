@@ -15,7 +15,9 @@ function VPSchedule() {
 
 	const [scheduleDate, setScheduleDate] = useState(date);
 
-	const handleSearch = () => {};
+	const handleSearch = () => {
+		setScheduleDate(date);
+	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
