@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { tokens } from '../../theme';
-import { Book } from '@mui/icons-material';
+import { BarChartOutlined, Book } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 import DataGridWrapper from '../../components/global/DataGridWrapper';
 import StatCard from '../../components/StatCard';
@@ -114,8 +114,8 @@ function VPDashboard() {
 				/>
 				<Divider orientation="vertical" />
 				<StatCard
-					icon={<Book sx={{ fontSize: '50px', color: colors.aastuGold[500] }} />}
-					title="Total Plans"
+					icon={<BarChartOutlined sx={{ fontSize: '50px', color: colors.aastuGold[500] }} />}
+					title="Total Reports"
 					data="10"
 				/>
 				<Divider orientation="vertical" />
@@ -128,7 +128,6 @@ function VPDashboard() {
 			<Stack
 				direction="column"
 				display="flex"
-				alignItems="center"
 				bgcolor={colors.grey[100]}
 				width="100%"
 				height="fit-content"
@@ -137,7 +136,11 @@ function VPDashboard() {
 				boxShadow={5}
 				p={1}
 				px={5}
+				gap={1}
 			>
+				<Typography variant="h5" component="p" fontWeight="bold">
+					View Plans
+				</Typography>
 				<DataGridWrapper>
 					<DataGrid
 						getRowId={(row) => row.plan_id}
