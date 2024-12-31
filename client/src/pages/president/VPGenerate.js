@@ -1,21 +1,28 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, TextField } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import { generateReportSchema } from '../../utils/yupSchemas';
 import SelectComponent from '../../components/form/SelectComponent';
+import ConfirmationModal from '../../components/modals/ConfirmationModal';
 
 function VPGenerate() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const date = new Date();
 
+	const [confirmOpen, setConfirmOpen] = useState(false);
+
+	const closeConfirm = () => {
+		setConfirmOpen(false);
+	};
+
 	const handleGenerate = (values) => {
 		console.log('🚀 ~ handleGenerate ~ values:', values);
 	};
 
-	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setFieldValue } = useFormik({
+	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setFieldValue, submitForm } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: '',
@@ -98,10 +105,27 @@ function VPGenerate() {
 						},
 					}}
 				/>
-				<Button type="submit" fullWidth variant="contained" size="large">
+				<Button
+					onClick={() => {
+						setConfirmOpen(true);
+					}}
+					fullWidth
+					variant="contained"
+					size="large"
+				>
 					Generate Plan
 				</Button>
 			</Grid2>
+			<ConfirmationModal
+				open={confirmOpen}
+				onCancel={closeConfirm}
+				onConfirm={() => {
+					submitForm();
+					setConfirmOpen(false);
+				}}
+				title="Generate Plan"
+				message="Are you sure you want to send this plan to each office?"
+			/>
 		</Grid2>
 	);
 }

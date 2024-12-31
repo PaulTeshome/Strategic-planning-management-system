@@ -27,7 +27,7 @@ export const generateReportSchema = yup.object().shape({
 	plan_document: yup
 		.mixed()
 		.nullable() // Allow null
-		.notRequired() // Make optional
+		.required('Plan document is required') // Make optional
 		.test(
 			'fileFormat',
 			'Unsupported File Format. Please select a PDF or Word document',
@@ -39,7 +39,7 @@ export const generateReportSchema = yup.object().shape({
 					'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 				].includes(value?.type)
 		)
-		.test('fileSize', 'File too large. Maximum size is 2MB', (value) => !value || value.size <= 2000000), // Max size 2MB
+		.test('fileSize', 'File too large. Maximum size is 4MB', (value) => !value || value.size <= 4000000), // Max size 2MB
 });
 
 export const scheduleSchema = yup.object().shape({
