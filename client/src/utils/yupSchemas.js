@@ -21,6 +21,27 @@ export const vpReportSchema = yup.object().shape({
 	department: yup.string().required('Department is required'),
 });
 
+export const generateReportSchema = yup.object().shape({
+	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
+	department: yup.string().required('Department is required'),
+	plan_document: yup
+		.mixed()
+		.nullable() // Allow null
+		.notRequired() // Make optional
+		.test(
+			'fileFormat',
+			'Unsupported File Format. Please select a PDF or Word document',
+			(value) =>
+				!value ||
+				[
+					'application/pdf',
+					'application/msword',
+					'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+				].includes(value?.type)
+		)
+		.test('fileSize', 'File too large. Maximum size is 2MB', (value) => !value || value.size <= 2000000), // Max size 2MB
+});
+
 export const scheduleSchema = yup.object().shape({
 	schedule_date: yup.date().typeError('Please specify a valid date!').required('required!'),
 });
