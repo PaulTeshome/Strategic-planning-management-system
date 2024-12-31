@@ -14,7 +14,7 @@ function ConfirmationModal({ open, onConfirm, onCancel, title, message, color })
 				style: {
 					paddingBlock: 20,
 					paddingInline: 10,
-					borderRadius: 20,
+					borderRadius: 5,
 				},
 			}}
 			maxWidth={'sm'}
