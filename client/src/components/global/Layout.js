@@ -34,13 +34,22 @@ function Layout() {
 	let dashboard = null;
 
 	switch (user.r_data) {
-		case 'president':
+		case 'vp':
 			dashboard = '/vp';
 			break;
-		case 'strategic':
+		case 'spd':
 			dashboard = '/strategic';
 			break;
-		case 'offices':
+		case 'vpo':
+			dashboard = '/office';
+			break;
+		case 'av':
+			dashboard = '/office';
+			break;
+		case 'ado':
+			dashboard = '/office';
+			break;
+		case 'rv':
 			dashboard = '/office';
 			break;
 		default:
