@@ -5,6 +5,7 @@ import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
 import { vpPlanSchema } from '../../utils/yupSchemas';
+import ViewPlanTable from '../../components/tables/ViewPlanTable';
 
 function VPplan() {
 	const theme = useTheme();
@@ -41,6 +42,7 @@ function VPplan() {
 			<Grid2
 				container
 				display="flex"
+				justifyContent="center"
 				alignItems="center"
 				width="65%"
 				gap={1}
@@ -58,6 +60,11 @@ function VPplan() {
 						value={values.year}
 						onChange={handleChange}
 						onBlur={handleBlur}
+						slotProps={{
+							htmlInput: {
+								min: 1,
+							},
+						}}
 						error={touched.year && !!errors.year}
 						helperText={touched.year && errors.year}
 					/>
@@ -81,12 +88,13 @@ function VPplan() {
 						]}
 					/>
 				</Grid2>
-				<Grid2 size={{ xs: 2 }} display="flex" alignItems="center">
+				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
 					<Button type="submit" fullWidth variant="contained" size="large">
 						Search Plan
 					</Button>
 				</Grid2>
 			</Grid2>
+			<ViewPlanTable />
 		</Stack>
 	);
 }
