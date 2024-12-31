@@ -6,16 +6,19 @@ import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
 import { vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
+import { mockPlan } from '../../components/data/mockData';
+import { CheckCircle } from '@mui/icons-material';
 
 function VPplan() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
 	const handleSearch = () => {};
+	const date = new Date();
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
-			year: '',
+			year: date.getFullYear(),
 			department: '',
 		},
 		validationSchema: vpPlanSchema,
@@ -44,7 +47,7 @@ function VPplan() {
 				display="flex"
 				justifyContent="center"
 				alignItems="center"
-				width="65%"
+				width="100%"
 				gap={1}
 				component="form"
 				onSubmit={handleSubmit}
@@ -93,8 +96,40 @@ function VPplan() {
 						Search Plan
 					</Button>
 				</Grid2>
+				<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
+					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
+						Plan for {values.year}
+					</Typography>
+				</Grid2>
+				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
+					<Button
+						fullWidth
+						variant="contained"
+						startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
+						size="medium"
+					>
+						Approve Plan
+					</Button>
+				</Grid2>
 			</Grid2>
-			<ViewPlanTable />
+
+			<ViewPlanTable
+				columns={[
+					{ name: 'Number', colSpan: 1 },
+					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
+					{ name: 'Weights', colSpan: 1 },
+					{ name: 'Measurements', colSpan: 1 },
+					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
+					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
+					{ name: 'Quarter 1', colSpan: 1 },
+					{ name: 'Quarter 2', colSpan: 1 },
+					{ name: 'Quarter 3', colSpan: 1 },
+					{ name: 'Quarter 4', colSpan: 1 },
+					{ name: 'Department', colSpan: 1 },
+				]}
+				rows={mockPlan}
+			/>
 		</Stack>
 	);
 }
