@@ -179,11 +179,11 @@ export const themeSettings = (mode) => {
 					},
 
 					outlined: {
-						border: `1px solid ${colors.aastuBlue[500]}`,
-						color: `${colors.aastuBlue[500]}`,
+						border: `1px solid ${colors.textBlue[500]}`,
+						color: `${colors.textBlue[500]}`,
 						'&:hover': {
-							border: `1px solid ${colors.aastuBlue[600]}`,
-							color: `${colors.aastuBlue[600]}`,
+							border: `1px solid ${colors.textBlue[600]}`,
+							color: `${colors.textBlue[600]}`,
 						},
 					},
 					outlinedError: {
