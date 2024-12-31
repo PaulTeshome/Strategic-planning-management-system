@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -8,10 +8,19 @@ import { vpReportSchema } from '../../utils/yupSchemas';
 import ViewReportTable from '../../components/tables/ViewReportTable';
 import { mockReport } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
+import ConfirmationModal from '../../components/modals/ConfirmationModal';
 
 function VPReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
+	const [confirmOpen, setConfirmOpen] = useState(false);
+
+	const closeConfirm = () => {
+		setConfirmOpen(false);
+	};
+	const handleApprove = () => {
+		console.log('🚀 ~ handleApprove ~ first:', values);
+	};
 
 	const handleSearch = () => {};
 	const date = new Date();
@@ -104,6 +113,9 @@ function VPReport() {
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
 					<Button
 						fullWidth
+						onClick={() => {
+							setConfirmOpen(true);
+						}}
 						variant="contained"
 						startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
 						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
@@ -111,6 +123,16 @@ function VPReport() {
 					>
 						Approve Report
 					</Button>
+					<ConfirmationModal
+						open={confirmOpen}
+						onCancel={closeConfirm}
+						onConfirm={() => {
+							handleApprove();
+							setConfirmOpen(false);
+						}}
+						title="Approve Report"
+						message="Are you sure you want to approve this report?"
+					/>
 				</Grid2>
 			</Grid2>
 

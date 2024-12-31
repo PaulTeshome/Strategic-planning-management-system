@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -8,12 +8,22 @@ import { vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
 import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
+import ConfirmationModal from '../../components/modals/ConfirmationModal';
 
 function VPplan() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
+	const [confirmOpen, setConfirmOpen] = useState(false);
+
+	const closeConfirm = () => {
+		setConfirmOpen(false);
+	};
+	const handleApprove = () => {
+		console.log('🚀 ~ handleApprove ~ first:', values);
+	};
 	const handleSearch = () => {};
+
 	const date = new Date();
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
@@ -104,6 +114,9 @@ function VPplan() {
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
 					<Button
 						fullWidth
+						onClick={() => {
+							setConfirmOpen(true);
+						}}
 						variant="contained"
 						startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
 						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
@@ -111,6 +124,16 @@ function VPplan() {
 					>
 						Approve Plan
 					</Button>
+					<ConfirmationModal
+						open={confirmOpen}
+						onCancel={closeConfirm}
+						onConfirm={() => {
+							handleApprove();
+							setConfirmOpen(false);
+						}}
+						title="Approve Plan"
+						message="Are you sure you want to approve this plan?"
+					/>
 				</Grid2>
 			</Grid2>
 
