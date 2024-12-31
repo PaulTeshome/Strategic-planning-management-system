@@ -15,7 +15,7 @@ function LoginPage() {
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
-			username: '',
+			email: '',
 			password: '',
 		},
 		validationSchema: loginSchema,
@@ -81,15 +81,15 @@ function LoginPage() {
 						</Typography>
 					</Stack>
 					<TextField
-						name="username"
-						label="Username"
+						name="email"
+						label="Email"
 						type="text"
 						fullWidth
-						value={values.username}
+						value={values.email}
 						onChange={handleChange}
 						onBlur={handleBlur}
-						error={touched.username && !!errors.username}
-						helperText={touched.username && errors.username}
+						error={touched.email && !!errors.email}
+						helperText={touched.email && errors.email}
 					/>
 
 					<PasswordComponent
