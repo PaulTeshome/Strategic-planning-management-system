@@ -23,50 +23,39 @@ function ViewPlanTable({ columns, rows }) {
 			color: 'white',
 			fontWeight: 'bold',
 			fontSize: '10px',
-			borderRight: `1px solid ${colors.grey[700]}`,
+			borderRight: `1px solid ${colors.grey[500]}`,
 		},
 	}));
-	// const StyledTableCell = styled(TableCell)(({ theme }) => ({
-	// 	[`&.${tableCellClasses.head}`]: {
-	// 		backgroundColor: colors.aastuBlue[500],
-	// 		color: 'white',
-	// 		fontWeight: 'bold',
-	// 		fontSize: '10px',
-	// 		width: 190,
-	// 		borderRight: '1px solid white',
-	// 		// "&:first-of-type": { width: 20 },
-	// 	},
-	// 	[`&.${tableCellClasses.body}`]: {
-	// 		fontWeight: 'bold',
-	// 		// "&:first-of-type": { width: 20 },
-	// 	},
-	// }));
 
 	const FirstColTableCell = styled(TableCell)(({ theme }) => ({
 		[`&.${tableCellClasses.body}`]: {
 			fontWeight: 'bold',
 			fontSize: '10px',
-			borderRight: `1px solid ${colors.grey[700]}`,
+			borderRight: `1px solid ${colors.grey[500]}`,
 		},
 	}));
 	const TableBodyCell = styled(TableCell)(({ theme }) => ({
 		[`&.${tableCellClasses.body}`]: {
 			fontSize: '10px',
-			borderRight: `1px solid ${colors.grey[700]}`,
+			borderRight: `1px solid ${colors.grey[500]}`,
 		},
 	}));
 	const StyledTableRow = styled(TableRow)(({ theme }) => ({
 		'&.goal': {
 			backgroundColor: colors.aastuGold[500],
+			'&:hover': { backgroundColor: colors.aastuGold[600] },
 		},
 		'&.main': {
 			backgroundColor: colors.textBlue[200],
+			'&:hover': { backgroundColor: colors.textBlue[300] },
 		},
 		'&.detail': {
-			backgroundColor: colors.grey[300],
+			backgroundColor: colors.grey[400],
+			'&:hover': { backgroundColor: colors.grey[500] },
 		},
 		'&.kpi': {
-			backgroundColor: colors.grey[100],
+			backgroundColor: colors.grey[200],
+			'&:hover': { backgroundColor: colors.grey[300] },
 		},
 	}));
 
