@@ -12,7 +12,7 @@ export const loginSchema = yup.object().shape({
 });
 
 export const vpPlanSchema = yup.object().shape({
-	year: yup.number().required('Year is required'),
+	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
 	department: yup.string().required('Department is required'),
 });
 
