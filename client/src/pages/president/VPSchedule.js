@@ -79,10 +79,10 @@ function VPSchedule() {
 					onBlur={handleBlur}
 					options={[
 						{ value: 'all', label: 'All' },
-						{ value: 'academics', label: 'Academics Office' },
-						{ value: 'president', label: 'President Office' },
-						{ value: 'research', label: 'Research Office' },
-						{ value: 'administration', label: 'Administration Office' },
+						{ value: 'av', label: 'Academic Vice Office' },
+						{ value: 'vpo', label: 'Vice President Office' },
+						{ value: 'rv', label: 'Research Vice Office' },
+						{ value: 'ado', label: 'Administration Vice Office' },
 					]}
 				/>
 				<Button type="submit" fullWidth variant="contained" size="large">
