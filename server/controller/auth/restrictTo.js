@@ -2,12 +2,12 @@ const { StatusCodes } = require("http-status-codes");
 const APIError = require("../../utils/apiError");
 const User = require("../../models/user.model");
 
-// roles -> ["sysAdmin", "orgAdmin"]
-exports.restrictTo = (isOrgOperation) => {
+// role -> ['ado', 'rv', 'vp', 'strategic', 'office', 'admin']
+exports.restrictTo = (...roles) => {
   return async (req, res, next) => {
     const user = await User.findOne({ _id: req.user.id });
 
-    if (user.isSystemAdmin) return next();
+    if (user.role in roles) return next();
 
 
     return next(

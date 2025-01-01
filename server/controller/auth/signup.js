@@ -85,10 +85,34 @@ exports.createAccount = catchAsync(async (req, res, next) => {
   });
 
   // add generated password to the user
+  newUser.password = process.env.DEFAULT_PASSWORD;
+  newUser.passwordConfirm = process.env.DEFAULT_PASSWORD;
 
+  // save the user
+  await newUser.save();
 
+  // send the email
+  const activationURL = `http://${"localhost:4000"}/activate?token=${newUser.activationToken}&email=${email}`;
+  try {
+    await new Email(newUser, activationURL).sendPasswordReset();
+    console.log(activationURL);
 
+    res.status(StatusCodes.CREATED).json({
+      status: "success",
+      message: newUser.activationToken,
+    });
+  } catch (err) {
+    newUser.activationToken = undefined;
+    newUser.activationTokenExpires = undefined;
+    await newUser.save({
+      validateBeforeSave: false,
+    });
 
+    return next(
+      new APIError("There was an error sending the email. Try again later!"),
+      500
+    );
+  }
 
   res.status(StatusCodes.CREATED).json({
     status: "success",
