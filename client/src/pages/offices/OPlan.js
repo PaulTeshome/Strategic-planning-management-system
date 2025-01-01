@@ -4,13 +4,13 @@ import React, { useContext, useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
-import ViewPlanTable from '../../components/tables/ViewPlanTable';
 import { mockPlan } from '../../components/data/mockData';
 import { Add, CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import MyContext from '../../utils/MyContext';
 import * as yup from 'yup';
+import CreatePlanTable from '../../components/tables/CreatePlanTable';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -39,18 +39,19 @@ function OPlan() {
 	const colors = tokens(theme.palette.mode);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [rows, setRows] = useState([]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
 	};
 	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', values);
+		console.log('🚀 ~ handleApprove ~ first:', planFormik.values);
 	};
 	const handleSearch = () => {};
 
 	const date = new Date();
 
-	const { values, errors, handleSubmit, handleBlur, handleChange, setFieldValue, touched } = useFormik({
+	const planFormik = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: user.r_data,
@@ -59,6 +60,44 @@ function OPlan() {
 		validationSchema: createPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	// const tableFormik = useFormik({
+	// 	initialValues: {
+	// 		year: date.getFullYear(),
+	// 		department: user.r_data,
+	// 		plan_document: null,
+	// 	},
+	// 	validationSchema: createPlanSchema,
+	// });
+
+	// const tableSchema = tableFields.reduce((acc, field) => {
+	// 	if (field.type === 'checkbox') {
+	// 		if (field.required) {
+	// 			acc[field.name] = yup.array().min(1, `Please select a ${field.label}!`);
+	// 		} else {
+	// 			acc[field.name] = yup.array();
+	// 		}
+	// 	} else {
+	// 		if (field.required) {
+	// 			acc[field.name] = yup.string().required(`${field.label} is required`);
+	// 		} else {
+	// 			acc[field.name] = yup.string();
+	// 		}
+	// 	}
+	// 	return acc;
+	// }, {});
+
+	const addGoal = () => {
+		const goalNumber = rows.length + 1;
+		const newGoal = {
+			number: goalNumber,
+			main_goal: `goal ${goalNumber}`,
+			weight: '',
+			main_functions: [],
+		};
+
+		setRows((prev) => [...prev, newGoal]);
+	};
 
 	return (
 		<Stack
@@ -74,7 +113,7 @@ function OPlan() {
 			px={5}
 			gap={2}
 			component="form"
-			onSubmit={handleSubmit}
+			onSubmit={planFormik.handleSubmit}
 			autoComplete="off"
 			noValidate
 		>
@@ -97,7 +136,7 @@ function OPlan() {
 						open={confirmOpen}
 						onCancel={closeConfirm}
 						onConfirm={() => {
-							handleApprove();
+							planFormik.submitForm();
 							setConfirmOpen(false);
 						}}
 						title="Submit Plan"
@@ -111,29 +150,29 @@ function OPlan() {
 						disabled
 						type="number"
 						fullWidth
-						value={values.year}
-						onChange={handleChange}
-						onBlur={handleBlur}
+						value={planFormik.values.year}
+						onChange={planFormik.handleChange}
+						onBlur={planFormik.handleBlur}
 						slotProps={{
 							htmlInput: {
 								min: 1,
 							},
 						}}
-						error={touched.year && !!errors.year}
-						helperText={touched.year && errors.year}
+						error={planFormik.touched.year && !!planFormik.errors.year}
+						helperText={planFormik.touched.year && planFormik.errors.year}
 					/>
 				</Grid2>
 				<Grid2 size={{ xs: 4 }}>
 					<SelectComponent
 						required={true}
-						touched={touched.department}
-						error={errors.department}
+						planFormiktouched={planFormik.touched.department}
+						error={planFormik.errors.department}
 						label="Department*"
 						name="department"
 						disabled={true}
-						value={values.department}
-						onChange={handleChange}
-						onBlur={handleBlur}
+						value={planFormik.values.department}
+						onChange={planFormik.handleChange}
+						onBlur={planFormik.handleBlur}
 						options={[
 							{ value: 'av', label: 'Academic Vice Office' },
 							{ value: 'vpo', label: 'Vice President Office' },
@@ -148,13 +187,13 @@ function OPlan() {
 						type="file"
 						label="Plan Document"
 						name="plan_document"
-						onBlur={handleBlur}
+						onBlur={planFormik.handleBlur}
 						onChange={(event) => {
-							setFieldValue('plan_document', event.currentTarget.files[0]);
+							planFormik.setFieldValue('plan_document', event.currentTarget.files[0]);
 						}}
 						// value={undefined}
-						error={touched.plan_document && Boolean(errors.plan_document)}
-						helperText={touched.plan_document && errors.plan_document}
+						error={planFormik.touched.plan_document && Boolean(planFormik.errors.plan_document)}
+						helperText={planFormik.touched.plan_document && planFormik.errors.plan_document}
 						slotProps={{
 							inputLabel: { shrink: true },
 							inputProps: {
@@ -167,11 +206,14 @@ function OPlan() {
 
 				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-						Plan for {values.year}
+						Plan for {planFormik.values.year}
 					</Typography>
 				</Grid2>
 				<Grid2 size={{ xs: 12 }} display="flex" pl="85%" alignItems="flex-end" maxHeight="fit-content">
 					<Button
+						onClick={() => {
+							addGoal();
+						}}
 						fullWidth
 						variant="contained"
 						startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
@@ -183,21 +225,23 @@ function OPlan() {
 				</Grid2>
 			</Grid2>
 
-			<ViewPlanTable
+			<CreatePlanTable
+				formikValue={planFormik}
 				columns={[
 					{ name: 'Number', colSpan: 1 },
 					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
 					{ name: 'Weights', colSpan: 1 },
 					{ name: 'Measurements', colSpan: 1 },
-					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
-					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
+					{ name: `Previous year(${planFormik.values.year - 1}) value`, colSpan: 1 },
+					{ name: `This year(${planFormik.values.year}) Goal`, colSpan: 1 },
 					{ name: 'Quarter 1', colSpan: 1 },
 					{ name: 'Quarter 2', colSpan: 1 },
 					{ name: 'Quarter 3', colSpan: 1 },
 					{ name: 'Quarter 4', colSpan: 1 },
 					{ name: 'Department', colSpan: 1 },
 				]}
-				rows={mockPlan}
+				rows={rows}
+				setRows={setRows}
 			/>
 		</Stack>
 	);
