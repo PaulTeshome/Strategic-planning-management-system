@@ -24,6 +24,7 @@ import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { Link } from 'react-router-dom';
 import useLogout from '../../hooks/useLogout';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 const Topbar = () => {
 	const theme = useTheme();
@@ -134,7 +135,9 @@ const Topbar = () => {
 							<MenuOutlined />
 						</Button>
 					)}
-
+					<Typography variant="h5" component="h1">
+						{getDepartmentByRole(user.r_data)}
+					</Typography>
 					{matches && (
 						<Menu
 							sx={{
