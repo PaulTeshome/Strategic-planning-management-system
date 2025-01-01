@@ -4,7 +4,7 @@ import { tokens } from '../../theme';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import { Book, CalendarMonth, Logout, NextPlan } from '@mui/icons-material';
+import { Book, CalendarMonth, Chat, Logout, NextPlan } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useLogout from '../../hooks/useLogout';
@@ -31,7 +31,7 @@ const Sidebar = () => {
 
 	const navElements = [
 		{
-			requiredRole: ['none'],
+			requiredRole: ['vp'],
 			element: (
 				<Fragment key="pres">
 					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
@@ -39,6 +39,23 @@ const Sidebar = () => {
 					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
 					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
 					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
+				</Fragment>
+			),
+		},
+		{
+			requiredRole: ['vpo', 'av', 'ado', 'rv'],
+			element: (
+				<Fragment key="pres">
+					<NavItem key="/offices/" title="Dashboard" to="/offices/" icon={<FaDashcube />} />
+					<NavItem key="/offices/plan" title="Plan" to="/offices/plan" icon={<Book />} />
+					<NavItem
+						key="/offices/report"
+						title="Report"
+						to="/offices/report"
+						icon={<BarChartOutlinedIcon />}
+					/>
+					<NavItem key="/offices/schedule" title="Schedule" to="/offices/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/offices/feedback" title="Feedback" to="/offices/feedback" icon={<Chat />} />
 				</Fragment>
 			),
 		},

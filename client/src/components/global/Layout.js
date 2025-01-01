@@ -13,6 +13,11 @@ import MainHolder from './MainHolder';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 const NotFound = lazy(() => import('../../pages/NotFound'));
+const ODashboard = lazy(() => import('../../pages/offices/ODashboard'));
+const OPlan = lazy(() => import('../../pages/offices/OPlan'));
+const OReport = lazy(() => import('../../pages/offices/OReport'));
+const OSchedule = lazy(() => import('../../pages/offices/OSchedule'));
+const OFeedback = lazy(() => import('../../pages/offices/OFeedback'));
 const VPDashboard = lazy(() => import('../../pages/president/VPDashboard'));
 const VPGenerate = lazy(() => import('../../pages/president/VPGenerate'));
 const VPplan = lazy(() => import('../../pages/president/VPplan'));
@@ -64,6 +69,19 @@ function Layout() {
 		{
 			element: <Route exact key="/redirect-path" path="/" element={<Navigate to={dashboard} />} />,
 			requiredRole: ['none'],
+		},
+		{
+			element: (
+				<Route key="/office-path" path="/offices" element={<MainHolder />}>
+					<Route index element={<ODashboard />} />
+					<Route path="plan" element={<OPlan />} />
+					<Route path="plan/:plan_id" element={<OPlan />} />
+					<Route path="report" element={<OReport />} />
+					<Route path="schedule" element={<OSchedule />} />
+					<Route path="feedback" element={<OFeedback />} />
+				</Route>
+			),
+			requiredRole: ['vpo', 'av', 'ado', 'rv'],
 		},
 		{
 			element: (
