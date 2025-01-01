@@ -64,11 +64,6 @@ const user = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    profilePhoto: {
-      type: String,
-      default: null,
-      trim: true,
-    },
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -82,8 +77,22 @@ const user = new mongoose.Schema(
       required: false,
       default: "user",
       enum: {
-        values: ["manager", "receptionist", "user"],
-        message: "role can be either reception, manager or user",
+        // vice president
+        // vice president office
+        // Academic Vice
+        // Research Vice
+        // Administration office
+        // strategic planning directorate
+
+        values: [
+          "vp",
+          "vpo",
+          "av",
+          "rv",
+          "ado",
+          "spd",
+        ],
+        message: "role must be within the specified values",
       },
     },
     passwordResetToken: {

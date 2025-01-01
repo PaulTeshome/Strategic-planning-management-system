@@ -63,52 +63,7 @@ exports.filterUserUpdateFields = (...allowedFields) => {
 // restrict to the user-himself
 exports.updateMe = factory.updateOne(User);
 
-/// update profile picture
-exports.updateIdPhoto = catchAsync(async (req, res, next) => {
-  if (!req.files) {
-    return next(new APIError("There is no file", 404));
-  }
 
-  if (!req.body.data) {
-    return next(new APIError("There is no ID Type", StatusCodes.BAD_REQUEST));
-  }
-  const parsedBody = JSON.parse(req.body.data);
-  // const { idPhotoType } = parsedBody;
-
-  const idPhoto = req.files.idPhoto;
-
-  if (!idPhoto.mimetype.startsWith("image")) {
-    return next(
-      new APIError("Please a Proper Id Photo", StatusCodes.BAD_REQUEST)
-    );
-  }
-
-  const user = await User.findOne({
-    _id: req.user.id,
-  });
-
-  const email = user.email;
-
-  if (!user) {
-    return next(new APIError(`User does not exist`, StatusCodes.BAD_REQUEST));
-  }
-
-  user.idPhoto = await fileUpload({
-    file: idPhoto,
-    name: `idPhoto_` + email,
-    filePath: "profiles",
-    maxSize: 1024 * 1024,
-  });
-
-  // update the type of id
-  // user.idPhotoType = idPhotoType;
-
-  await user.save();
-
-  res.status(StatusCodes.CREATED).json({
-    status: "success",
-  });
-});
 
 // update the users account type
 // restrict to the admin
