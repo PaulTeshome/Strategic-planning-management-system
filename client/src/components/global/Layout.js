@@ -18,6 +18,14 @@ const VPGenerate = lazy(() => import('../../pages/president/VPGenerate'));
 const VPplan = lazy(() => import('../../pages/president/VPplan'));
 const VPReport = lazy(() => import('../../pages/president/VPReport'));
 const VPSchedule = lazy(() => import('../../pages/president/VPSchedule'));
+const SPDashboard = lazy(() => import('../../pages/strategic/SPDashboard'));
+const SPIntegratePlan = lazy(() => import('../../pages/strategic/SPIntegratePlan'));
+const SPIntegrateReport = lazy(() => import('../../pages/strategic/SPIntegrateReport'));
+const SPViewPlans = lazy(() => import('../../pages/strategic/SPViewPlans'));
+const SPViewReport = lazy(() => import('../../pages/strategic/SPViewReport'));
+const SPplan = lazy(() => import('../../pages/strategic/SPplan'));
+const SPReport = lazy(() => import('../../pages/strategic/SPReport'));
+const SPSchedule = lazy(() => import('../../pages/strategic/SPSchedule'));
 
 function Layout() {
 	const theme = useTheme();
@@ -56,6 +64,9 @@ function Layout() {
 			dashboard = '/login';
 	}
 
+	console.log('Current user role:', user.r_data);
+	console.log('Navigating to:', dashboard);
+
 	const appRoutes = [
 		{
 			element: <Route key="/login-path" path="/login" element={<Login />} />,
@@ -77,6 +88,21 @@ function Layout() {
 				</Route>
 			),
 			requiredRole: ['vp'],
+		},
+		{
+			element: (
+				<Route key="/strategic-path" path="/strategic" element={<MainHolder />}>
+					<Route index element={<SPDashboard/>} />
+					<Route path="plan" element={<SPViewPlans />} />
+					<Route path="plan/:plan_id" element={<SPplan />} />
+					<Route path="report" element={<SPViewReport />} />
+					<Route path="report/:report_id" element={<SPReport />} />
+					<Route path="schedule" element={<SPSchedule />} />
+					<Route path="integrate-plan" element={<SPIntegratePlan />} />
+					<Route path="integrate-report" element={<SPIntegrateReport />} />
+				</Route>
+			),
+			requiredRole: ['spd'],
 		},
 	];
 

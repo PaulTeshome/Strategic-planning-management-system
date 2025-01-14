@@ -31,7 +31,7 @@ const Sidebar = () => {
 
 	const navElements = [
 		{
-			requiredRole: ['none'],
+			requiredRole: ['vp'],
 			element: (
 				<Fragment key="pres">
 					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
@@ -39,6 +39,19 @@ const Sidebar = () => {
 					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
 					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
 					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
+				</Fragment>
+			),
+		},
+		{
+			requiredRole: ['spd'],
+			element: (
+				<Fragment key="strac">
+					<NavItem key="/strategic/" title="Dashboard" to="/strategic/" icon={<FaDashcube />} />
+					<NavItem key="/strategic/plan" title="Plan" to="/strategic/plan" icon={<Book />} />
+					<NavItem key="/strategic/report" title="Report" to="/strategic/report" icon={<BarChartOutlinedIcon />} />
+					<NavItem key="/strategic/schedule" title="Schedule" to="/strategic/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/strategic/integrate-plan" title="Integrate Plan" to="/strategic/integrate-plan" icon={<NextPlan />} />
+					<NavItem key="/strategic/integrate-report" title="Integrate Report" to="/strategic/integrate-report" icon={<NextPlan />} />
 				</Fragment>
 			),
 		},
