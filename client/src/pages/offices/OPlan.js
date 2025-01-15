@@ -39,7 +39,7 @@ function OPlan() {
 	const colors = tokens(theme.palette.mode);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [rows, setRows] = useState([]);
+	const [planData, setPlanData] = useState([]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
@@ -87,18 +87,6 @@ function OPlan() {
 	// 	return acc;
 	// }, {});
 
-	const addGoal = () => {
-		const goalNumber = rows.length + 1;
-		const newGoal = {
-			number: goalNumber,
-			main_goal: `goal ${goalNumber}`,
-			weight: '',
-			main_functions: [],
-		};
-
-		setRows((prev) => [...prev, newGoal]);
-	};
-
 	return (
 		<Stack
 			direction="column"
@@ -112,15 +100,22 @@ function OPlan() {
 			p={2}
 			px={5}
 			gap={2}
-			component="form"
-			onSubmit={planFormik.handleSubmit}
-			autoComplete="off"
-			noValidate
 		>
 			<Typography variant="h5" component="p" fontWeight="bold">
 				Create {getDepartmentByRole(user.r_data)} Plans
 			</Typography>
-			<Grid2 container display="flex" justifyContent="center" alignItems="center" width="100%" gap={1}>
+			<Grid2
+				container
+				display="flex"
+				justifyContent="center"
+				alignItems="center"
+				width="100%"
+				gap={1}
+				component="form"
+				onSubmit={planFormik.handleSubmit}
+				autoComplete="off"
+				noValidate
+			>
 				<Grid2 size={{ xs: 12 }} display="flex" alignItems="flex-end" pl="85%" maxHeight="fit-content">
 					<Button
 						onClick={() => {
@@ -209,40 +204,9 @@ function OPlan() {
 						Plan for {planFormik.values.year}
 					</Typography>
 				</Grid2>
-				<Grid2 size={{ xs: 12 }} display="flex" pl="85%" alignItems="flex-end" maxHeight="fit-content">
-					<Button
-						onClick={() => {
-							addGoal();
-						}}
-						fullWidth
-						variant="contained"
-						startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
-						size="small"
-					>
-						Add Goal
-					</Button>
-				</Grid2>
 			</Grid2>
 
-			<CreatePlanTable
-				formikValue={planFormik}
-				columns={[
-					{ name: 'Number', colSpan: 1 },
-					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
-					{ name: 'Weights', colSpan: 1 },
-					{ name: 'Measurements', colSpan: 1 },
-					{ name: `Previous year(${planFormik.values.year - 1}) value`, colSpan: 1 },
-					{ name: `This year(${planFormik.values.year}) Goal`, colSpan: 1 },
-					{ name: 'Quarter 1', colSpan: 1 },
-					{ name: 'Quarter 2', colSpan: 1 },
-					{ name: 'Quarter 3', colSpan: 1 },
-					{ name: 'Quarter 4', colSpan: 1 },
-					{ name: 'Department', colSpan: 1 },
-				]}
-				rows={rows}
-				setRows={setRows}
-			/>
+			<CreatePlanTable year={planFormik.values.year} planData={planData} setPlanData={setPlanData} />
 		</Stack>
 	);
 }
