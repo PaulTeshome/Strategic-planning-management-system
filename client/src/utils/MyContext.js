@@ -14,7 +14,9 @@ export const MyContextProvider = ({ children }) => {
 			return {
 				user_id: '',
 				user_name: '',
-				r_data: 'av',
+				// r_data: 'rv',
+				r_data: 'spd',
+				// r_data: 'vp',
 			};
 		} else {
 			const parsedUser = JSON.parse(storedUser);
