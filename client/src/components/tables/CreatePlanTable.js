@@ -84,22 +84,29 @@ function CreatePlanTable({ columns, rows, formikValue, setRows }) {
 			})
 		);
 	};
-	const addDetail = (detail, goalNumber) => {
-		const functionNumber = detail.length + 1;
-		const newMainFunction = {
-			number: goalNumber + '.' + functionNumber,
-			main_func_title: `function ${functionNumber}`,
+	const addDetail = (detail, functionNumber) => {
+		const detailNumber = detail.length + 1;
+		const [goalNumber] = functionNumber.split('.');
+		const newDetailFunction = {
+			number: functionNumber + '.' + detailNumber,
+			detail_func_title: `detail ${detailNumber}`,
 			weight: '',
-			detail_functions: [],
+			KPIs: [],
 		};
 
 		setRows((prevRows) =>
 			prevRows.map((goal) => {
 				if (goal.number === goalNumber) {
-					// Add new main function to the target goal's detail
 					return {
 						...goal,
-						detail: [...goal.detail, newMainFunction],
+						main_functions: goal.main_functions.map((fn) =>
+							fn.number === functionNumber
+								? {
+										...fn,
+										detail_functions: [...fn.detail_functions, newDetailFunction],
+									}
+								: fn
+						),
 					};
 				}
 				return goal; // Keep other goals unchanged
