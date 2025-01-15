@@ -13,9 +13,9 @@ import {
 	TableRow,
 	TextField,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { tokens } from '../../theme';
-import { Add } from '@mui/icons-material';
+import { Add, Save } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -68,6 +68,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 	}));
 
 	const [rows, setRows] = useState([]);
+
 	const columns = [
 		{ name: 'Number', colSpan: 1 },
 		{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
@@ -82,33 +83,31 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		{ name: 'Department', colSpan: 1 },
 	];
 
-	const handleSearch = () => {};
+	const handleSearch = (e) => {
+		console.log('hello');
+		console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
+	};
 
-	const createPlanSchema = yup.object().shape({
-		year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
-		department: yup.string().required('Department is required'),
-		plan_document: yup
-			.mixed()
-			.nullable() // Allow null
-			.required('Plan document is required') // Make optional
-			.test(
-				'fileFormat',
-				'Unsupported File Format. Please select a PDF or Word document',
-				(value) =>
-					!value ||
-					[
-						'application/pdf',
-						'application/msword',
-						'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-					].includes(value?.type)
-			)
-			.test('fileSize', 'File too large. Maximum size is 4MB', (value) => !value || value.size <= 4000000), // Max size 2MB
-	});
+	const [fields, setFields] = useState([]);
 
+	const fieldsRef = React.useRef([]);
+
+	// Update fields when data changes
+	useEffect(() => {
+		fieldsRef.current = []; // Reset fieldsRef// Populate fieldsRef
+		setFields(fieldsRef.current); // Update fields state
+	}, []);
+	const createPlanSchema = yup.object().shape(
+		fields.reduce((acc, field) => {
+			acc[field.name] = yup.string().required(`${field.label} is required!`);
+			return acc;
+		}, {})
+	);
 	const planDataFormik = useFormik({
-		initialValues: {
-			plan_document: null,
-		},
+		initialValues: fields.reduce((acc, field) => {
+			acc[field.name] = '';
+			return acc;
+		}, {}),
 		validationSchema: createPlanSchema,
 		onSubmit: handleSearch,
 	});
@@ -119,6 +118,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			number: `${goalNumber}`,
 			main_goal: `goal ${goalNumber}`,
 			weight: '',
+			value: '',
 			main_functions: [],
 		};
 
@@ -131,6 +131,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			number: goalNumber + '.' + functionNumber,
 			main_func_title: `function ${functionNumber}`,
 			weight: '',
+			value: '',
 			detail_functions: [],
 		};
 
@@ -154,6 +155,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			number: functionNumber + '.' + detailNumber,
 			detail_func_title: `detail ${detailNumber}`,
 			weight: '',
+			value: '',
 			KPIs: [],
 		};
 
@@ -190,8 +192,9 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		);
 		const newKPI = {
 			number: detailNumber + '.' + kpiNumber,
-			kpi_title: `kpi ${kpiNumber}`,
+			KPI_title: `kpi ${kpiNumber}`,
 			weight: '',
+			value: '',
 		};
 
 		setRows((prevRows) =>
@@ -223,7 +226,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		);
 	};
 
-	const renderTableRows = (data) => {
+	const renderTableRows = (data, fieldsRef) => {
 		const rows = [];
 
 		const renderRow = (item, level = 0) => {
@@ -250,6 +253,16 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 				textName = 'main_goal';
 			}
 
+			const TitleFieldLabel = textLabel + ' Title ' + item.number;
+			const TitleFieldName = textName + '_title_' + item.number;
+			const WeightFieldLabel = textLabel + ' Weight ' + item.number;
+			const WeightFieldName = textName + '_weight_' + item.number;
+
+			fieldsRef.current.push(
+				{ name: TitleFieldName, label: TitleFieldLabel },
+				{ name: WeightFieldName, label: WeightFieldLabel }
+			);
+
 			rows.push(
 				<StyledTableRow key={item.number} className={className}>
 					<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>{item.number}</FirstColTableCell>
@@ -261,19 +274,15 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							fullWidth
 							size="small"
 							type="text"
-							label={textLabel + ' Title ' + item.number}
-							name={textName + '_title_' + item.number}
+							label={TitleFieldLabel}
+							name={TitleFieldName}
 							onBlur={planDataFormik.handleBlur}
 							onChange={planDataFormik.handleChange}
-							value={planDataFormik.values[textName + '_title_' + item.number]}
+							value={planDataFormik.values[TitleFieldName]}
 							error={
-								planDataFormik.touched[textName + '_title_' + item.number] &&
-								Boolean(planDataFormik.errors[textName + '_title_' + item.number])
+								planDataFormik.touched[TitleFieldName] && Boolean(planDataFormik.errors[TitleFieldName])
 							}
-							helperText={
-								planDataFormik.touched[textName + '_title_' + item.number] &&
-								planDataFormik.errors[textName + '_title_' + item.number]
-							}
+							helperText={planDataFormik.touched[TitleFieldName] && planDataFormik.errors[TitleFieldName]}
 						/>
 					</TableBodyCell>
 					<TableBodyCell>
@@ -284,18 +293,17 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							fullWidth
 							size="small"
 							type="number"
-							label={textLabel + ' Weight ' + item.number}
-							name={textName + '_weight_' + item.number}
+							label={WeightFieldLabel}
+							name={WeightFieldName}
 							onBlur={planDataFormik.handleBlur}
 							onChange={planDataFormik.handleChange}
-							value={planDataFormik.values[textName + '_weight_' + item.number]}
+							value={planDataFormik.values[WeightFieldName]}
 							error={
-								planDataFormik.touched[textName + '_weight_' + item.number] &&
-								Boolean(planDataFormik.errors[textName + '_weight_' + item.number])
+								planDataFormik.touched[WeightFieldName] &&
+								Boolean(planDataFormik.errors[WeightFieldName])
 							}
 							helperText={
-								planDataFormik.touched[textName + '_weight_' + item.number] &&
-								planDataFormik.errors[textName + '_weight_' + item.number]
+								planDataFormik.touched[WeightFieldName] && planDataFormik.errors[WeightFieldName]
 							}
 						/>
 					</TableBodyCell>
@@ -371,11 +379,36 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		};
 
 		data.forEach((item) => renderRow(item));
+		// setFields((prev) => [...prev, ...fields]);
+
 		return rows;
 	};
 	return (
-		<Grid2 container display="flex" justifyContent="center" alignItems="center" width="100%" gap={1}>
-			<Grid2 size={{ xs: 12 }} display="flex" pl="85%" alignItems="flex-end" maxHeight="fit-content">
+		<Grid2
+			container
+			display="flex"
+			justifyContent="center"
+			alignItems="center"
+			width="100%"
+			gap={1}
+			component="form"
+			onSubmit={planDataFormik.handleSubmit}
+			autoComplete="off"
+			noValidate
+		>
+			<Grid2 size={{ xs: 10.4 }} display="flex" pl={'70%'} alignItems="flex-end" maxHeight="fit-content">
+				<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					startIcon={<Save sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+					// sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
+					size="medium"
+				>
+					Save Plan
+				</Button>
+			</Grid2>
+			<Grid2 size={{ xs: 1.5 }} display="flex" alignItems="flex-end" maxHeight="fit-content">
 				<Button
 					onClick={() => {
 						addGoal();
@@ -400,7 +433,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							))}
 						</StyledTableRow>
 					</TableHead>
-					<TableBody>{renderTableRows(rows)}</TableBody>
+					<TableBody>{renderTableRows(rows, fieldsRef)}</TableBody>
 				</Table>
 			</TableContainer>
 		</Grid2>
