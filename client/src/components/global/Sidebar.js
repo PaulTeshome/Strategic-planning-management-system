@@ -31,14 +31,19 @@ const Sidebar = () => {
 
 	const navElements = [
 		{
-			requiredRole: ['vp'],
+			requiredRole: ['vpo', 'av', 'ado', 'rv'],
 			element: (
 				<Fragment key="pres">
-					<NavItem key="/vp/" title="Dashboard" to="/vp/" icon={<FaDashcube />} />
-					<NavItem key="/vp/plan" title="Plan" to="/vp/plan" icon={<Book />} />
-					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
-					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
-					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
+					<NavItem key="/offices/" title="Dashboard" to="/offices/" icon={<FaDashcube />} />
+					<NavItem key="/offices/plan" title="Plan" to="/offices/plan" icon={<Book />} />
+					<NavItem
+						key="/offices/report"
+						title="Report"
+						to="/offices/report"
+						icon={<BarChartOutlinedIcon />}
+					/>
+					<NavItem key="/offices/schedule" title="Schedule" to="/offices/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/offices/feedback" title="Feedback" to="/offices/feedback" icon={<Chat />} />
 				</Fragment>
 			),
 		},
@@ -48,10 +53,30 @@ const Sidebar = () => {
 				<Fragment key="strac">
 					<NavItem key="/strategic/" title="Dashboard" to="/strategic/" icon={<FaDashcube />} />
 					<NavItem key="/strategic/plan" title="Plan" to="/strategic/plan" icon={<Book />} />
-					<NavItem key="/strategic/report" title="Report" to="/strategic/report" icon={<BarChartOutlinedIcon />} />
-					<NavItem key="/strategic/schedule" title="Schedule" to="/strategic/schedule" icon={<CalendarMonth />} />
-					<NavItem key="/strategic/integrate-plan" title="Integrate Plan" to="/strategic/integrate-plan" icon={<NextPlan />} />
-					<NavItem key="/strategic/integrate-report" title="Integrate Report" to="/strategic/integrate-report" icon={<NextPlan />} />
+					<NavItem
+						key="/strategic/report"
+						title="Report"
+						to="/strategic/report"
+						icon={<BarChartOutlinedIcon />}
+					/>
+					<NavItem
+						key="/strategic/schedule"
+						title="Schedule"
+						to="/strategic/schedule"
+						icon={<CalendarMonth />}
+					/>
+					<NavItem
+						key="/strategic/integrate-plan"
+						title="Integrate Plan"
+						to="/strategic/integrate-plan"
+						icon={<NextPlan />}
+					/>
+					<NavItem
+						key="/strategic/integrate-report"
+						title="Integrate Report"
+						to="/strategic/integrate-report"
+						icon={<NextPlan />}
+					/>
 				</Fragment>
 			),
 		},
