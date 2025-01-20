@@ -31,7 +31,7 @@ const Sidebar = () => {
 
 	const navElements = [
 		{
-			requiredRole: ['vpo', 'av', 'ado', 'rv'],
+			requiredRole: ['vp'],
 			element: (
 				<Fragment key="pres">
 					<NavItem key="/offices/" title="Dashboard" to="/offices/" icon={<FaDashcube />} />
