@@ -1,19 +1,21 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { tokens } from '../../theme';
 import SelectComponent from '../../components/form/SelectComponent';
 import { useFormik } from 'formik';
 import { vpReportSchema } from '../../utils/yupSchemas';
 import dayjs from 'dayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import MyContext from '../../utils/MyContext';
 
-function VPSchedule() {
+function OSchedule() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const date = new Date();
 
 	const [scheduleDate, setScheduleDate] = useState(date);
+	const { user } = useContext(MyContext);
 
 	const handleSearch = () => {
 		setScheduleDate(date);
@@ -22,7 +24,7 @@ function VPSchedule() {
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
-			department: '',
+			department: user.r_data,
 		},
 		validationSchema: vpReportSchema,
 		onSubmit: handleSearch,
@@ -72,6 +74,7 @@ function VPSchedule() {
 					required={true}
 					touched={touched.department}
 					error={errors.department}
+					disabled={true}
 					label="Department*"
 					name="department"
 					value={values.department}
@@ -106,4 +109,4 @@ function VPSchedule() {
 	);
 }
 
-export default VPSchedule;
+export default OSchedule;
