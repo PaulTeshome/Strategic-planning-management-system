@@ -23,11 +23,16 @@ import * as yup from 'yup';
 import MyContext from '../../utils/MyContext';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import SelectComponent from '../form/SelectComponent';
+import toast from 'react-hot-toast';
 
-function CreatePlanTable({ year, planData, setPlanData }) {
+function CreatePlanTable({ rows, setRows, year, planData, setPlanData }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const { user } = useContext(MyContext);
+
+	const date = new Date();
+	const presentYear = date.getFullYear();
+	const isPreviousYear = year < presentYear;
 
 	const GroupedTableCell = styled(TableCell)(({ theme }) => ({
 		[`&.${tableCellClasses.head}`]: {
@@ -78,8 +83,11 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		// console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
 	};
 
-	const [rows, setRows] = useState([]);
-	// console.log('🚀 renderrrrrr');
+	const handleLocalSave = () => {
+		localStorage.setItem(`plan ${year}`, JSON.stringify(rows));
+		toast.success('Plan Saved Successfully!');
+		console.log(rows);
+	};
 
 	const columns = [
 		{ name: 'Number', colSpan: 1 },
@@ -99,9 +107,8 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		const goalNumber = rows.length + 1;
 		const newGoal = {
 			number: `${goalNumber}`,
-			main_goal: `goal ${goalNumber}`,
+			main_goal: '',
 			weight: '',
-			value: '',
 			main_functions: [],
 		};
 
@@ -112,9 +119,8 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		const functionNumber = main_functions.length + 1;
 		const newMainFunction = {
 			number: goalNumber + '.' + functionNumber,
-			main_func_title: `function ${functionNumber}`,
+			main_func_title: '',
 			weight: '',
-			value: '',
 			detail_functions: [],
 		};
 
@@ -137,9 +143,8 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		const [goalNumber] = functionNumber.split('.');
 		const newDetailFunction = {
 			number: functionNumber + '.' + detailNumber,
-			detail_func_title: `detail ${detailNumber}`,
+			detail_func_title: '',
 			weight: '',
-			value: '',
 			KPIs: [],
 		};
 
@@ -176,9 +181,8 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		// );
 		const newKPI = {
 			number: detailNumber + '.' + kpiNumber,
-			KPI_title: `kpi ${kpiNumber}`,
+			KPI_title: '',
 			weight: '',
-			value: '',
 			measurement: '',
 			past_year: '',
 			present_goal: '',
@@ -332,6 +336,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			let className = '';
 			let textLabel = '';
 			let textName = '';
+
 			let measurement_name = '';
 			let past_year_name = '';
 			let present_goal_name = '';
@@ -341,10 +346,10 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			let quarter_4_name = '';
 			// let department_name = '';
 
-			if (item.KPI_title) {
+			if (item.KPI_title !== undefined) {
 				className = 'kpi';
 				textLabel = 'KPI';
-				textName = 'kpi';
+				textName = 'KPI_title';
 				measurement_name = `measurement_` + item.number.replace(/\./g, '_');
 				past_year_name = `past_year_` + item.number.replace(/\./g, '_');
 				present_goal_name = `present_goal_` + item.number.replace(/\./g, '_');
@@ -353,22 +358,23 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 				quarter_3_name = `quarter_3_` + item.number.replace(/\./g, '_');
 				quarter_4_name = `quarter_4_` + item.number.replace(/\./g, '_');
 				// department_name = `department_` + item.number.replace(/\./g, '_');
-			} else if (item.detail_func_title) {
+			} else if (item.detail_func_title !== undefined) {
 				className = 'detail';
 				textLabel = 'Detail Function ';
-				textName = 'detail';
-			} else if (item.main_func_title) {
+				textName = 'detail_func_title';
+			} else if (item.main_func_title !== undefined) {
 				className = 'main';
 				textLabel = 'Main Function';
-				textName = 'mainFunc';
-			} else if (item.main_goal) {
+				textName = 'main_func_title';
+			} else if (item.main_goal !== undefined) {
 				className = 'goal';
 				textLabel = 'Main Goal';
-				textName = 'goal';
+				textName = 'main_goal';
 			}
 
 			const TitleFieldLabel = textLabel + ' Title ' + item.number;
-			const TitleFieldName = textName + '_title_' + item.number.replace(/\./g, '_');
+			const TitleFieldName = textName + '_' + item.number.replace(/\./g, '_');
+			console.log('🚀 ~ renderRow ~ textName:', textName);
 			const WeightFieldLabel = textLabel + ' Weight ' + item.number;
 			const WeightFieldName = textName + '_weight_' + item.number.replace(/\./g, '_');
 
@@ -379,13 +385,13 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 
 			const KPIinitials = isKPI
 				? {
-						[measurement_name]: '',
-						[past_year_name]: '',
-						[present_goal_name]: '',
-						[quarter_1_name]: '',
-						[quarter_2_name]: '',
-						[quarter_3_name]: '',
-						[quarter_4_name]: '',
+						[measurement_name]: item.measurement,
+						[past_year_name]: item.past_year,
+						[present_goal_name]: item.present_goal,
+						[quarter_1_name]: item.quarter_1,
+						[quarter_2_name]: item.quarter_2,
+						[quarter_3_name]: item.quarter_3,
+						[quarter_4_name]: item.quarter_4,
 					}
 				: {};
 
@@ -401,15 +407,15 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 					}
 				: {};
 
-			// console.log('🚀 ~ renderRow ~ ', { [TitleFieldName]: '', [WeightFieldName]: '', ...KPIinitials });
+			console.log('🚀 ~ renderRow ~ ', item);
 
 			tableRows.push(
 				<Formik
 					key={TitleFieldName}
 					onSubmit={handleRowSubmit}
 					initialValues={{
-						[TitleFieldName]: '',
-						[WeightFieldName]: '',
+						[TitleFieldName]: item[textName],
+						[WeightFieldName]: item.weight,
 						...KPIinitials,
 					}}
 					validationSchema={yup.object().shape({
@@ -438,7 +444,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 									name={TitleFieldName}
 									onBlur={handleBlur}
 									onChange={(event) => {
-										item.value = event.target.value;
+										item[textName] = event.target.value;
 										setFieldValue(TitleFieldName, event.target.value);
 									}}
 									value={values[TitleFieldName]}
@@ -782,9 +788,11 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 				<Button
 					type="submit"
 					fullWidth
+					disabled={isPreviousYear}
 					variant="contained"
 					startIcon={<Save sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
 					// sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
+					onClick={handleLocalSave}
 					size="medium"
 				>
 					Save Plan
@@ -792,6 +800,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			</Grid2>
 			<Grid2 size={{ xs: 1.5 }} display="flex" alignItems="flex-end" maxHeight="fit-content">
 				<Button
+					disabled={isPreviousYear}
 					onClick={() => {
 						addGoal();
 					}}
