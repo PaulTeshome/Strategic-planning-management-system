@@ -110,7 +110,7 @@ function Layout() {
 		{
 			element: (
 				<Route key="/strategic-path" path="/strategic" element={<MainHolder />}>
-					<Route index element={<SPDashboard/>} />
+					<Route index element={<SPDashboard />} />
 					<Route path="plan" element={<SPViewPlans />} />
 					<Route path="plan/:plan_id" element={<SPplan />} />
 					<Route path="report" element={<SPViewReport />} />
@@ -155,13 +155,13 @@ function Layout() {
 						},
 						success: {
 							style: {
-								background: colors.greenAccent[800],
+								background: colors.greenAccent[400],
 								color: colors.black,
 							},
 						},
 						error: {
 							style: {
-								background: colors.redAccent[700],
+								background: colors.redAccent[400],
 								color: colors.black,
 							},
 						},
