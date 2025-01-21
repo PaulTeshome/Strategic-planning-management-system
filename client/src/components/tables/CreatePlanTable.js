@@ -238,6 +238,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 
 			const handleRowSubmit = (value) => {
 				console.log('🚀 ~ handleRowSubmit ~ value:', value);
+				console.log('🚀 ~ handleRowSubmit ~ value:', rows);
 			};
 
 			tableRows.push(
@@ -273,8 +274,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 									name={TitleFieldName}
 									onBlur={handleBlur}
 									onChange={(event) => {
-										console.log('🚀 ~ renderRow ~ TitleFieldName:', TitleFieldName);
-										console.log('🚀 ~ renderRow ~ event:', event.target.value);
+										item.value = event.target.value;
 										setFieldValue(TitleFieldName, event.target.value);
 									}}
 									value={values[TitleFieldName]}
@@ -293,7 +293,10 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 									label={WeightFieldLabel}
 									name={WeightFieldName}
 									onBlur={handleBlur}
-									onChange={handleChange}
+									onChange={(event) => {
+										item.weight = event.target.value;
+										setFieldValue(WeightFieldName, event.target.value);
+									}}
 									value={values[WeightFieldName]}
 									error={touched[WeightFieldName] && Boolean(errors[WeightFieldName])}
 									helperText={touched[WeightFieldName] && errors[WeightFieldName]}
