@@ -13,10 +13,10 @@ import {
 	TableRow,
 	TextField,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { tokens } from '../../theme';
 import { Add, Save } from '@mui/icons-material';
-import { useFormik } from 'formik';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 
 function CreatePlanTable({ year, planData, setPlanData }) {
@@ -67,7 +67,13 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		},
 	}));
 
+	const handleSearch = (e) => {
+		console.log('hello');
+		console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
+	};
+
 	const [rows, setRows] = useState([]);
+	console.log('🚀 renderrrrrr');
 
 	const columns = [
 		{ name: 'Number', colSpan: 1 },
@@ -82,35 +88,6 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		{ name: 'Quarter 4', colSpan: 1 },
 		{ name: 'Department', colSpan: 1 },
 	];
-
-	const handleSearch = (e) => {
-		console.log('hello');
-		console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
-	};
-
-	const [fields, setFields] = useState([]);
-
-	const fieldsRef = React.useRef([]);
-
-	// Update fields when data changes
-	useEffect(() => {
-		fieldsRef.current = []; // Reset fieldsRef// Populate fieldsRef
-		setFields(fieldsRef.current); // Update fields state
-	}, []);
-	const createPlanSchema = yup.object().shape(
-		fields.reduce((acc, field) => {
-			acc[field.name] = yup.string().required(`${field.label} is required!`);
-			return acc;
-		}, {})
-	);
-	const planDataFormik = useFormik({
-		initialValues: fields.reduce((acc, field) => {
-			acc[field.name] = '';
-			return acc;
-		}, {}),
-		validationSchema: createPlanSchema,
-		onSubmit: handleSearch,
-	});
 
 	const addGoal = () => {
 		const goalNumber = rows.length + 1;
@@ -148,6 +125,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			})
 		);
 	};
+
 	const addDetail = (detail, functionNumber) => {
 		const detailNumber = detail.length + 1;
 		const [goalNumber] = functionNumber.split('.');
@@ -226,8 +204,8 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		);
 	};
 
-	const renderTableRows = (data, fieldsRef) => {
-		const rows = [];
+	const renderTableRows = (rows) => {
+		const tableRows = [];
 
 		const renderRow = (item, level = 0) => {
 			const isKPI = item.KPI_title !== undefined;
@@ -242,129 +220,148 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			} else if (item.detail_func_title) {
 				className = 'detail';
 				textLabel = 'Detail Function ';
-				textName = 'detail_func';
+				textName = 'detail';
 			} else if (item.main_func_title) {
 				className = 'main';
 				textLabel = 'Main Function';
-				textName = 'main_func';
+				textName = 'mainFunc';
 			} else if (item.main_goal) {
 				className = 'goal';
 				textLabel = 'Main Goal';
-				textName = 'main_goal';
+				textName = 'goal';
 			}
 
 			const TitleFieldLabel = textLabel + ' Title ' + item.number;
-			const TitleFieldName = textName + '_title_' + item.number;
+			const TitleFieldName = textName + '_title_' + item.number.replace(/\./g, '_');
 			const WeightFieldLabel = textLabel + ' Weight ' + item.number;
-			const WeightFieldName = textName + '_weight_' + item.number;
+			const WeightFieldName = textName + '_weight_' + item.number.replace(/\./g, '_');
 
-			fieldsRef.current.push(
-				{ name: TitleFieldName, label: TitleFieldLabel },
-				{ name: WeightFieldName, label: WeightFieldLabel }
-			);
+			const handleRowSubmit = (value) => {
+				console.log('🚀 ~ handleRowSubmit ~ value:', value);
+			};
 
-			rows.push(
-				<StyledTableRow key={item.number} className={className}>
-					<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>{item.number}</FirstColTableCell>
-					<TableBodyCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
-						<TextField
-							slotProps={{
-								inputLabel: { shrink: true },
-							}}
-							fullWidth
-							size="small"
-							type="text"
-							label={TitleFieldLabel}
-							name={TitleFieldName}
-							onBlur={planDataFormik.handleBlur}
-							onChange={planDataFormik.handleChange}
-							value={planDataFormik.values[TitleFieldName]}
-							error={
-								planDataFormik.touched[TitleFieldName] && Boolean(planDataFormik.errors[TitleFieldName])
-							}
-							helperText={planDataFormik.touched[TitleFieldName] && planDataFormik.errors[TitleFieldName]}
-						/>
-					</TableBodyCell>
-					<TableBodyCell>
-						<TextField
-							slotProps={{
-								inputLabel: { shrink: true },
-							}}
-							fullWidth
-							size="small"
-							type="number"
-							label={WeightFieldLabel}
-							name={WeightFieldName}
-							onBlur={planDataFormik.handleBlur}
-							onChange={planDataFormik.handleChange}
-							value={planDataFormik.values[WeightFieldName]}
-							error={
-								planDataFormik.touched[WeightFieldName] &&
-								Boolean(planDataFormik.errors[WeightFieldName])
-							}
-							helperText={
-								planDataFormik.touched[WeightFieldName] && planDataFormik.errors[WeightFieldName]
-							}
-						/>
-					</TableBodyCell>
-					{item.main_goal !== undefined && (
-						<TableBodyCell colSpan={8}>
-							<Button
-								onClick={() => {
-									addMain(item.main_functions, item.number);
-								}}
-								fullWidth
-								variant="text"
-								startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-								size="small"
-							>
-								Add Main Function
-							</Button>
-						</TableBodyCell>
+			tableRows.push(
+				<Formik
+					key={TitleFieldName}
+					onSubmit={handleRowSubmit}
+					initialValues={{
+						[TitleFieldName]: '',
+						[WeightFieldName]: '',
+					}}
+					validationSchema={yup.object().shape({
+						[TitleFieldName]: yup.string().required(`${TitleFieldLabel} is required`),
+						[WeightFieldName]: yup
+							.number()
+							.required(`${WeightFieldLabel} is required`)
+							.min(0, 'Weight cannot be negative'),
+					})}
+				>
+					{({ values, errors, touched, handleBlur, handleChange, submitForm, setFieldValue }) => (
+						<StyledTableRow key={TitleFieldName} className={className}>
+							<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
+								{item.number}
+							</FirstColTableCell>
+							<TableBodyCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
+								<TextField
+									slotProps={{
+										inputLabel: { shrink: true },
+									}}
+									fullWidth
+									size="small"
+									type="text"
+									label={TitleFieldLabel}
+									name={TitleFieldName}
+									onBlur={handleBlur}
+									onChange={(event) => {
+										console.log('🚀 ~ renderRow ~ TitleFieldName:', TitleFieldName);
+										console.log('🚀 ~ renderRow ~ event:', event.target.value);
+										setFieldValue(TitleFieldName, event.target.value);
+									}}
+									value={values[TitleFieldName]}
+									error={touched[TitleFieldName] && Boolean(errors[TitleFieldName])}
+									helperText={touched[TitleFieldName] && errors[TitleFieldName]}
+								/>
+							</TableBodyCell>
+							<TableBodyCell>
+								<TextField
+									slotProps={{
+										inputLabel: { shrink: true },
+									}}
+									fullWidth
+									size="small"
+									type="number"
+									label={WeightFieldLabel}
+									name={WeightFieldName}
+									onBlur={handleBlur}
+									onChange={handleChange}
+									value={values[WeightFieldName]}
+									error={touched[WeightFieldName] && Boolean(errors[WeightFieldName])}
+									helperText={touched[WeightFieldName] && errors[WeightFieldName]}
+								/>
+							</TableBodyCell>
+							{item.main_goal !== undefined && (
+								<TableBodyCell colSpan={8}>
+									<Button
+										onClick={() => {
+											submitForm();
+											addMain(item.main_functions, item.number);
+										}}
+										fullWidth
+										variant="text"
+										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+										size="small"
+									>
+										Add Main Function
+									</Button>
+								</TableBodyCell>
+							)}
+							{item.main_func_title !== undefined && (
+								<TableBodyCell colSpan={8}>
+									<Button
+										onClick={() => {
+											submitForm();
+											addDetail(item.detail_functions, item.number);
+										}}
+										fullWidth
+										variant="text"
+										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+										size="small"
+									>
+										Add Detail Function
+									</Button>
+								</TableBodyCell>
+							)}
+							{item.detail_func_title !== undefined && (
+								<TableBodyCell colSpan={8}>
+									<Button
+										onClick={() => {
+											submitForm();
+											addKPI(item.KPIs, item.number);
+										}}
+										fullWidth
+										variant="text"
+										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+										size="small"
+									>
+										Add KPI
+									</Button>
+								</TableBodyCell>
+							)}
+							{isKPI && (
+								<>
+									<TableBodyCell>{item.measurement}</TableBodyCell>
+									<TableBodyCell>{item.past_year}</TableBodyCell>
+									<TableBodyCell>{item.present_goal}</TableBodyCell>
+									<TableBodyCell>{item.quarter_1}</TableBodyCell>
+									<TableBodyCell>{item.quarter_2}</TableBodyCell>
+									<TableBodyCell>{item.quarter_3}</TableBodyCell>
+									<TableBodyCell>{item.quarter_4}</TableBodyCell>
+									<TableBodyCell>{item.department}</TableBodyCell>
+								</>
+							)}
+						</StyledTableRow>
 					)}
-					{item.main_func_title !== undefined && (
-						<TableBodyCell colSpan={8}>
-							<Button
-								onClick={() => {
-									addDetail(item.detail_functions, item.number);
-								}}
-								fullWidth
-								variant="text"
-								startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-								size="small"
-							>
-								Add Detail Function
-							</Button>
-						</TableBodyCell>
-					)}
-					{item.detail_func_title !== undefined && (
-						<TableBodyCell colSpan={8}>
-							<Button
-								onClick={() => {
-									addKPI(item.KPIs, item.number);
-								}}
-								fullWidth
-								variant="text"
-								startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-								size="small"
-							>
-								Add KPI
-							</Button>
-						</TableBodyCell>
-					)}
-					{isKPI && (
-						<>
-							<TableBodyCell>{item.measurement}</TableBodyCell>
-							<TableBodyCell>{item.past_year}</TableBodyCell>
-							<TableBodyCell>{item.present_goal}</TableBodyCell>
-							<TableBodyCell>{item.quarter_1}</TableBodyCell>
-							<TableBodyCell>{item.quarter_2}</TableBodyCell>
-							<TableBodyCell>{item.quarter_3}</TableBodyCell>
-							<TableBodyCell>{item.quarter_4}</TableBodyCell>
-							<TableBodyCell>{item.department}</TableBodyCell>
-						</>
-					)}
-				</StyledTableRow>
+				</Formik>
 			);
 
 			if (item.main_functions) {
@@ -378,11 +375,10 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			}
 		};
 
-		data.forEach((item) => renderRow(item));
-		// setFields((prev) => [...prev, ...fields]);
-
-		return rows;
+		rows.forEach((item) => renderRow(item));
+		return tableRows;
 	};
+
 	return (
 		<Grid2
 			container
@@ -391,10 +387,10 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			alignItems="center"
 			width="100%"
 			gap={1}
-			component="form"
-			onSubmit={planDataFormik.handleSubmit}
-			autoComplete="off"
-			noValidate
+			// component="form"
+			// onSubmit={planDataFormik.handleSubmit}
+			// autoComplete="off"
+			// noValidate
 		>
 			<Grid2 size={{ xs: 10.4 }} display="flex" pl={'70%'} alignItems="flex-end" maxHeight="fit-content">
 				<Button
@@ -433,7 +429,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							))}
 						</StyledTableRow>
 					</TableHead>
-					<TableBody>{renderTableRows(rows, fieldsRef)}</TableBody>
+					<TableBody>{renderTableRows(rows)}</TableBody>
 				</Table>
 			</TableContainer>
 		</Grid2>
