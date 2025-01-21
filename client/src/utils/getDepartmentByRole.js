@@ -1,11 +1,11 @@
 export const getDepartmentByRole = (role) => {
 	const roleToDepartmentMap = {
-		vp: 'Vice President',
-		spd: 'Strategy and Planning Directorate',
+		vp: 'President Office',
+		spd: 'Strategic Planning Directorate',
 		vpo: 'Vice President Office',
-		av: 'Academic Vice Office',
-		ado: 'Administrative Vice Office',
-		rv: 'Research Vice Office',
+		av: 'Academic Affairs Vice President',
+		ado: 'Administrative Development Vice President',
+		rv: 'Research and Technology Transfer Vice President',
 		none: 'Unassigned Department', // Default department for unknown roles
 	};
 
