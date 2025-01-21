@@ -3,6 +3,7 @@ import {
 	Button,
 	Grid2,
 	Paper,
+	Stack,
 	styled,
 	Table,
 	TableBody,
@@ -12,16 +13,21 @@ import {
 	TableHead,
 	TableRow,
 	TextField,
+	Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { tokens } from '../../theme';
-import { Add, Save } from '@mui/icons-material';
+import { Add, Delete, Save } from '@mui/icons-material';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import MyContext from '../../utils/MyContext';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import SelectComponent from '../form/SelectComponent';
 
 function CreatePlanTable({ year, planData, setPlanData }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
+	const { user } = useContext(MyContext);
 
 	const GroupedTableCell = styled(TableCell)(({ theme }) => ({
 		[`&.${tableCellClasses.head}`]: {
@@ -69,11 +75,11 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 
 	const handleSearch = (e) => {
 		console.log('hello');
-		console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
+		// console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
 	};
 
 	const [rows, setRows] = useState([]);
-	console.log('🚀 renderrrrrr');
+	// console.log('🚀 renderrrrrr');
 
 	const columns = [
 		{ name: 'Number', colSpan: 1 },
@@ -159,20 +165,28 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 	};
 
 	const addKPI = (kpi, detailNumber) => {
-		console.log('🚀 ~ addKPI ~ detailNumber:', detailNumber);
+		// console.log('🚀 ~ addKPI ~ detailNumber:', detailNumber);
 		const kpiNumber = kpi.length + 1;
 		const [goalNumber, functionNumber] = detailNumber.split('.');
-		console.log(
-			'🚀 ~ addKPI ~ goalNumber, functionNumber, detailNumber:',
-			goalNumber,
-			functionNumber,
-			detailNumber
-		);
+		// console.log(
+		// '🚀 ~ addKPI ~ goalNumber, functionNumber, detailNumber:',
+		// goalNumber,
+		// functionNumber,
+		// detailNumber
+		// );
 		const newKPI = {
 			number: detailNumber + '.' + kpiNumber,
 			KPI_title: `kpi ${kpiNumber}`,
 			weight: '',
 			value: '',
+			measurement: '',
+			past_year: '',
+			present_goal: '',
+			quarter_1: '',
+			quarter_2: '',
+			quarter_3: '',
+			quarter_4: '',
+			department: user.r_data,
 		};
 
 		setRows((prevRows) =>
@@ -204,6 +218,111 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 		);
 	};
 
+	const reassignNumbers = (items, parentNumber = '') => {
+		return items.map((item, index) => {
+			const newNumber = parentNumber ? `${parentNumber}.${index + 1}` : `${index + 1}`;
+			const updatedItem = { ...item, number: newNumber };
+
+			// Recursively update nested structures
+			if (item.main_functions) {
+				updatedItem.main_functions = reassignNumbers(item.main_functions, newNumber);
+			}
+			if (item.detail_functions) {
+				updatedItem.detail_functions = reassignNumbers(item.detail_functions, newNumber);
+			}
+			if (item.KPIs) {
+				updatedItem.KPIs = reassignNumbers(item.KPIs, newNumber);
+			}
+
+			return updatedItem;
+		});
+	};
+
+	const removeGoal = (goalNumber) => {
+		setRows((prevRows) => reassignNumbers(prevRows.filter((goal) => goal.number !== goalNumber)));
+	};
+
+	const removeMain = (goalNumber, functionNumber) => {
+		setRows((prevRows) =>
+			reassignNumbers(
+				prevRows.map((goal) => {
+					if (goal.number === goalNumber) {
+						return {
+							...goal,
+							main_functions: goal.main_functions.filter((main) => main.number !== functionNumber),
+						};
+					}
+					return goal;
+				})
+			)
+		);
+	};
+
+	const removeDetail = (goalNumber, functionNumber, detailNumber) => {
+		setRows((prevRows) =>
+			reassignNumbers(
+				prevRows.map((goal) => {
+					if (goal.number === goalNumber) {
+						return {
+							...goal,
+							main_functions: goal.main_functions.map((main) => {
+								if (main.number === goalNumber + '.' + functionNumber) {
+									console.log(
+										'🚀 ~ main_functions:goal.main_functions.map ~ functionNumber:',
+										functionNumber
+									);
+									return {
+										...main,
+										detail_functions: main.detail_functions.filter(
+											(detail) => detail.number !== detailNumber
+										),
+									};
+								}
+								return main;
+							}),
+						};
+					}
+					return goal;
+				})
+			)
+		);
+	};
+
+	const removeKPI = (goalNumber, functionNumber, detailNumber, kpiNumber) => {
+		setRows((prevRows) =>
+			reassignNumbers(
+				prevRows.map((goal) => {
+					if (goal.number === goalNumber) {
+						return {
+							...goal,
+							main_functions: goal.main_functions.map((main) => {
+								if (main.number === goalNumber + '.' + functionNumber) {
+									return {
+										...main,
+										detail_functions: main.detail_functions.map((detail) => {
+											if (
+												detail.number ===
+												goalNumber + '.' + functionNumber + '.' + detailNumber
+											) {
+												return {
+													...detail,
+													KPIs: detail.KPIs.filter((kpi) => kpi.number !== kpiNumber),
+												};
+											}
+											return detail;
+										}),
+									};
+								}
+								return main;
+							}),
+						};
+					}
+					return goal;
+				})
+			)
+		);
+	};
+
 	const renderTableRows = (rows) => {
 		const tableRows = [];
 
@@ -213,10 +332,27 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			let className = '';
 			let textLabel = '';
 			let textName = '';
+			let measurement_name = '';
+			let past_year_name = '';
+			let present_goal_name = '';
+			let quarter_1_name = '';
+			let quarter_2_name = '';
+			let quarter_3_name = '';
+			let quarter_4_name = '';
+			// let department_name = '';
+
 			if (item.KPI_title) {
 				className = 'kpi';
 				textLabel = 'KPI';
 				textName = 'kpi';
+				measurement_name = `measurement_` + item.number.replace(/\./g, '_');
+				past_year_name = `past_year_` + item.number.replace(/\./g, '_');
+				present_goal_name = `present_goal_` + item.number.replace(/\./g, '_');
+				quarter_1_name = `quarter_1_` + item.number.replace(/\./g, '_');
+				quarter_2_name = `quarter_2_` + item.number.replace(/\./g, '_');
+				quarter_3_name = `quarter_3_` + item.number.replace(/\./g, '_');
+				quarter_4_name = `quarter_4_` + item.number.replace(/\./g, '_');
+				// department_name = `department_` + item.number.replace(/\./g, '_');
 			} else if (item.detail_func_title) {
 				className = 'detail';
 				textLabel = 'Detail Function ';
@@ -237,9 +373,35 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 			const WeightFieldName = textName + '_weight_' + item.number.replace(/\./g, '_');
 
 			const handleRowSubmit = (value) => {
-				console.log('🚀 ~ handleRowSubmit ~ value:', value);
-				console.log('🚀 ~ handleRowSubmit ~ value:', rows);
+				// console.log('🚀 ~ handleRowSubmit ~ value:', value);
+				// console.log('🚀 ~ handleRowSubmit ~ value:', rows);
 			};
+
+			const KPIinitials = isKPI
+				? {
+						[measurement_name]: '',
+						[past_year_name]: '',
+						[present_goal_name]: '',
+						[quarter_1_name]: '',
+						[quarter_2_name]: '',
+						[quarter_3_name]: '',
+						[quarter_4_name]: '',
+					}
+				: {};
+
+			const KPIValidations = isKPI
+				? {
+						[measurement_name]: yup.string().required(`required`),
+						[past_year_name]: yup.number().required(`required`),
+						[present_goal_name]: yup.number().required(`required`),
+						[quarter_1_name]: yup.number().required(`required`),
+						[quarter_2_name]: yup.number().required(`required`),
+						[quarter_3_name]: yup.number().required(`required`),
+						[quarter_4_name]: yup.number().required(`required`),
+					}
+				: {};
+
+			// console.log('🚀 ~ renderRow ~ ', { [TitleFieldName]: '', [WeightFieldName]: '', ...KPIinitials });
 
 			tableRows.push(
 				<Formik
@@ -248,6 +410,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 					initialValues={{
 						[TitleFieldName]: '',
 						[WeightFieldName]: '',
+						...KPIinitials,
 					}}
 					validationSchema={yup.object().shape({
 						[TitleFieldName]: yup.string().required(`${TitleFieldLabel} is required`),
@@ -255,6 +418,7 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							.number()
 							.required(`${WeightFieldLabel} is required`)
 							.min(0, 'Weight cannot be negative'),
+						...KPIValidations,
 					})}
 				>
 					{({ values, errors, touched, handleBlur, handleChange, submitForm, setFieldValue }) => (
@@ -304,62 +468,281 @@ function CreatePlanTable({ year, planData, setPlanData }) {
 							</TableBodyCell>
 							{item.main_goal !== undefined && (
 								<TableBodyCell colSpan={8}>
-									<Button
-										onClick={() => {
-											submitForm();
-											addMain(item.main_functions, item.number);
-										}}
-										fullWidth
-										variant="text"
-										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-										size="small"
-									>
-										Add Main Function
-									</Button>
+									<Stack direction="row" display="flex">
+										<Button
+											sx={{ flex: 6 }}
+											onClick={() => {
+												submitForm();
+												if (
+													Object.keys(errors).length === 0 &&
+													touched[TitleFieldName] &&
+													touched[WeightFieldName]
+												) {
+													addMain(item.main_functions, item.number);
+												}
+											}}
+											fullWidth
+											variant="text"
+											startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+											size="small"
+										>
+											Add Main Function
+										</Button>
+										<Delete
+											sx={{
+												color: colors.redAccent[400],
+												'&:hover': { color: colors.redAccent[200] },
+												flex: 1,
+											}}
+											onClick={() => {
+												removeGoal(item.number);
+											}}
+										/>
+									</Stack>
 								</TableBodyCell>
 							)}
+
 							{item.main_func_title !== undefined && (
 								<TableBodyCell colSpan={8}>
-									<Button
-										onClick={() => {
-											submitForm();
-											addDetail(item.detail_functions, item.number);
-										}}
-										fullWidth
-										variant="text"
-										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-										size="small"
-									>
-										Add Detail Function
-									</Button>
+									<Stack direction="row" display="flex">
+										<Button
+											sx={{ flex: 6 }}
+											onClick={() => {
+												submitForm();
+												if (
+													Object.keys(errors).length === 0 &&
+													touched[TitleFieldName] &&
+													touched[WeightFieldName]
+												) {
+													addDetail(item.detail_functions, item.number);
+												}
+											}}
+											fullWidth
+											variant="text"
+											startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+											size="small"
+										>
+											Add Detail Function
+										</Button>
+										<Delete
+											sx={{
+												color: colors.redAccent[400],
+												'&:hover': { color: colors.redAccent[200] },
+												flex: 1,
+											}}
+											onClick={() => {
+												const num = item.number.split('.');
+												removeMain(num[0], item.number);
+											}}
+										/>
+									</Stack>
 								</TableBodyCell>
 							)}
+
 							{item.detail_func_title !== undefined && (
 								<TableBodyCell colSpan={8}>
-									<Button
-										onClick={() => {
-											submitForm();
-											addKPI(item.KPIs, item.number);
-										}}
-										fullWidth
-										variant="text"
-										startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-										size="small"
-									>
-										Add KPI
-									</Button>
+									<Stack direction="row" display="flex">
+										<Button
+											sx={{ flex: 6 }}
+											onClick={() => {
+												submitForm();
+												if (
+													Object.keys(errors).length === 0 &&
+													touched[TitleFieldName] &&
+													touched[WeightFieldName]
+												) {
+													addKPI(item.KPIs, item.number);
+												}
+											}}
+											fullWidth
+											variant="text"
+											startIcon={<Add sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+											size="small"
+										>
+											Add KPI
+										</Button>
+										<Delete
+											sx={{
+												color: colors.redAccent[400],
+												'&:hover': { color: colors.redAccent[200] },
+												flex: 1,
+											}}
+											onClick={() => {
+												const num = item.number.split('.');
+												// console.log('🚀 ~ renderRow ~ num:', num);
+												removeDetail(num[0], num[1], item.number);
+											}}
+										/>
+									</Stack>
 								</TableBodyCell>
 							)}
+
 							{isKPI && (
 								<>
-									<TableBodyCell>{item.measurement}</TableBodyCell>
-									<TableBodyCell>{item.past_year}</TableBodyCell>
-									<TableBodyCell>{item.present_goal}</TableBodyCell>
-									<TableBodyCell>{item.quarter_1}</TableBodyCell>
-									<TableBodyCell>{item.quarter_2}</TableBodyCell>
-									<TableBodyCell>{item.quarter_3}</TableBodyCell>
-									<TableBodyCell>{item.quarter_4}</TableBodyCell>
-									<TableBodyCell>{item.department}</TableBodyCell>
+									<TableBodyCell>
+										<SelectComponent
+											required={true}
+											touched={touched[measurement_name]}
+											error={errors[measurement_name]}
+											label="Measurement"
+											value={values[measurement_name] || ''}
+											name={measurement_name}
+											onChange={(event) => {
+												item.measurement = event.target.value;
+												setFieldValue(measurement_name, event.target.value);
+											}}
+											onBlur={handleBlur}
+											helperText={touched[measurement_name] && errors[measurement_name]}
+											options={[
+												{ value: 'number', label: 'Number' },
+												{ value: 'percent', label: 'Percent' },
+												{ value: 'money', label: 'Money' },
+											]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Past Year Value"
+											name={past_year_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.past_year = event.target.value;
+												setFieldValue(past_year_name, event.target.value);
+											}}
+											value={values[past_year_name]}
+											error={touched[past_year_name] && Boolean(errors[past_year_name])}
+											helperText={touched[past_year_name] && errors[past_year_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Present Goal"
+											name={present_goal_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.present_goal = event.target.value;
+												setFieldValue(present_goal_name, event.target.value);
+											}}
+											value={values[present_goal_name]}
+											error={touched[present_goal_name] && Boolean(errors[present_goal_name])}
+											helperText={touched[present_goal_name] && errors[present_goal_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Quarter 1"
+											name={quarter_1_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.quarter_1 = event.target.value;
+												setFieldValue(quarter_1_name, event.target.value);
+											}}
+											value={values[quarter_1_name]}
+											error={touched[quarter_1_name] && Boolean(errors[quarter_1_name])}
+											helperText={touched[quarter_1_name] && errors[quarter_1_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Quarter 2"
+											name={quarter_2_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.quarter_2 = event.target.value;
+												setFieldValue(quarter_2_name, event.target.value);
+											}}
+											value={values[quarter_2_name]}
+											error={touched[quarter_2_name] && Boolean(errors[quarter_2_name])}
+											helperText={touched[quarter_2_name] && errors[quarter_2_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										{' '}
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Quarter 3"
+											name={quarter_3_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.quarter_3 = event.target.value;
+												setFieldValue(quarter_3_name, event.target.value);
+											}}
+											value={values[quarter_3_name]}
+											error={touched[quarter_3_name] && Boolean(errors[quarter_3_name])}
+											helperText={touched[quarter_3_name] && errors[quarter_3_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										{' '}
+										<TextField
+											slotProps={{
+												inputLabel: { shrink: true },
+											}}
+											fullWidth
+											size="small"
+											type="number"
+											label="Quarter 4"
+											name={quarter_4_name}
+											onBlur={handleBlur}
+											onChange={(event) => {
+												item.quarter_4 = event.target.value;
+												setFieldValue(quarter_4_name, event.target.value);
+											}}
+											value={values[quarter_4_name]}
+											error={touched[quarter_4_name] && Boolean(errors[quarter_4_name])}
+											helperText={touched[quarter_4_name] && errors[quarter_4_name]}
+										/>
+									</TableBodyCell>
+									<TableBodyCell>
+										<Stack direction="row" display="flex" alignItems="center">
+											<Typography sx={{ flex: 2 }} variant="caption">
+												{getDepartmentByRole(item.department)}
+											</Typography>
+
+											<Delete
+												sx={{
+													color: colors.redAccent[400],
+													'&:hover': { color: colors.redAccent[200] },
+													flex: 1,
+												}}
+												onClick={() => {
+													const num = item.number.split('.');
+													console.log('🚀 ~ renderRow ~ num:', num);
+													console.log('🚀 ~ renderRow ~ num:', item);
+													removeKPI(num[0], num[1], num[2], item.number);
+												}}
+											/>
+										</Stack>
+									</TableBodyCell>
 								</>
 							)}
 						</StyledTableRow>
