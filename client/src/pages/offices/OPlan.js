@@ -11,6 +11,7 @@ import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import MyContext from '../../utils/MyContext';
 import * as yup from 'yup';
 import CreatePlanTable from '../../components/tables/CreatePlanTable';
+import { useParams } from 'react-router-dom';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -37,55 +38,37 @@ function OPlan() {
 	const theme = useTheme();
 	const { user } = useContext(MyContext);
 	const colors = tokens(theme.palette.mode);
+	const { plan_id } = useParams();
+
+	const [plan, setPlan] = useState({ plan_id: plan_id });
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [planData, setPlanData] = useState([]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
 	};
-	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', planFormik.values);
+
+	const handlePlanSubmit = (values) => {
+		console.log('🚀 ~ handlePlanSubmit ~ values:', values);
 	};
-	const handleSearch = () => {};
 
 	const date = new Date();
+
+	const [rows, setRows] = useState(() => {
+		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
+		return storedPlan ? JSON.parse(storedPlan) : [];
+	});
 
 	const planFormik = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: user.r_data,
 			plan_document: null,
+			planData: rows,
 		},
 		validationSchema: createPlanSchema,
-		onSubmit: handleSearch,
+		onSubmit: handlePlanSubmit,
 	});
-
-	// const tableFormik = useFormik({
-	// 	initialValues: {
-	// 		year: date.getFullYear(),
-	// 		department: user.r_data,
-	// 		plan_document: null,
-	// 	},
-	// 	validationSchema: createPlanSchema,
-	// });
-
-	// const tableSchema = tableFields.reduce((acc, field) => {
-	// 	if (field.type === 'checkbox') {
-	// 		if (field.required) {
-	// 			acc[field.name] = yup.array().min(1, `Please select a ${field.label}!`);
-	// 		} else {
-	// 			acc[field.name] = yup.array();
-	// 		}
-	// 	} else {
-	// 		if (field.required) {
-	// 			acc[field.name] = yup.string().required(`${field.label} is required`);
-	// 		} else {
-	// 			acc[field.name] = yup.string();
-	// 		}
-	// 	}
-	// 	return acc;
-	// }, {});
 
 	return (
 		<Stack
@@ -206,7 +189,7 @@ function OPlan() {
 				</Grid2>
 			</Grid2>
 
-			<CreatePlanTable year={planFormik.values.year} planData={planData} setPlanData={setPlanData} />
+			<CreatePlanTable rows={rows} setRows={setRows} year={planFormik.values.year} />
 		</Stack>
 	);
 }
