@@ -9,6 +9,7 @@ import ViewPlanTable from '../../components/tables/ViewPlanTable';
 import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function VPplan() {
 	const theme = useTheme();
@@ -94,10 +95,10 @@ function VPplan() {
 						onBlur={handleBlur}
 						options={[
 							{ value: 'all', label: 'All' },
-							{ value: 'av', label: 'Academic Vice Office' },
-							{ value: 'vpo', label: 'Vice President Office' },
-							{ value: 'rv', label: 'Research Vice Office' },
-							{ value: 'ado', label: 'Administration Vice Office' },
+							{ value: 'av', label: getDepartmentByRole('av') },
+							{ value: 'vpo', label: getDepartmentByRole('vpo') },
+							{ value: 'rv', label: getDepartmentByRole('rv') },
+							{ value: 'ado', label: getDepartmentByRole('ado') },
 						]}
 					/>
 				</Grid2>
