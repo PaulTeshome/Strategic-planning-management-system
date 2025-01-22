@@ -7,7 +7,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import DataGridWrapper from '../../components/global/DataGridWrapper';
 import StatCard from '../../components/StatCard';
 import CustomToolbar from '../../components/global/CustomToolbar';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import usePlanApi from '../../api/plan';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -68,11 +68,7 @@ function VPDashboard() {
 			headerName: 'Year',
 			flex: 1,
 		},
-		{
-			field: 'submitted_by',
-			headerName: 'Submitted By',
-			flex: 1,
-		},
+
 		{
 			field: 'actions',
 			headerName: 'Actions',

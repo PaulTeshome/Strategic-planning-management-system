@@ -9,6 +9,11 @@ const usePlanApi = () => {
 		return axios.patch(`/strategicPlan/${data.id}`, data, { withCredentials: true }).then((res) => res.data);
 	};
 
+	const getPlan = ({ queryKey }) => {
+		const [, plan_id] = queryKey;
+
+		return axios.get(`/strategicPlan/${plan_id}`, { withCredentials: true }).then((res) => res.data);
+	};
 	const getAllPlans = ({ queryKey }) => {
 		return axios.get('/strategicPlan/', { withCredentials: true }).then((res) => res.data);
 	};
@@ -23,7 +28,7 @@ const usePlanApi = () => {
 	// 	return axios.post('/auth/refresh', data, { withCredentials: true }).then((res) => res.data);
 	// };
 
-	return { getAllPlans, updateSchedule, getBy, addStrategicPlan };
+	return { getPlan, getAllPlans, updateSchedule, getBy, addStrategicPlan };
 };
 
 export default usePlanApi;

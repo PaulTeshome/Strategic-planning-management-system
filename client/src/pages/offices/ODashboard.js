@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Box, Button, Divider, Stack, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { BarChartOutlined, Book, CalendarMonth } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
@@ -10,6 +10,10 @@ import CustomToolbar from '../../components/global/CustomToolbar';
 import { Link } from 'react-router-dom';
 import MyContext from '../../utils/MyContext';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { formatDate } from '../../utils/formatDate';
+import usePlanApi from '../../api/plan';
+import { useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 function ODashboard() {
 	const theme = useTheme();
@@ -17,53 +21,46 @@ function ODashboard() {
 
 	const { user } = useContext(MyContext);
 
-	const [rows, setRows] = useState([
-		{
-			plan_id: '2',
-			plan_date: '12-12-2024',
-			department: getDepartmentByRole(user.r_data),
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '3',
-			plan_date: '12-12-2024',
-			department: getDepartmentByRole(user.r_data),
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '1',
-			plan_date: '12-12-2024',
-			department: getDepartmentByRole(user.r_data),
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '4',
-			plan_date: '12-12-2024',
-			department: getDepartmentByRole(user.r_data),
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '5',
-			plan_date: '12-12-2024',
-			department: getDepartmentByRole(user.r_data),
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-	]);
+	const [rows, setRows] = useState([]);
+
+	const { getAllPlans } = usePlanApi();
+
+	const getPatientsQuery = useQuery({
+		queryKey: ['plans'],
+		queryFn: getAllPlans,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPatientsQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
+			toast.error(
+				getPatientsQuery.error?.response?.data?.message ||
+					getPatientsQuery.error.message ||
+					'Error getting plans'
+			);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.error]);
+
+	useMemo(() => {
+		if (getPatientsQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlans', getPatientsQuery.data.data);
+			const patientList = getPatientsQuery.data?.data?.data;
+			setRows([...patientList]);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.data]);
 
 	const columns = [
 		{
-			field: 'plan_id',
-			headerName: 'Id',
-		},
-		{
-			field: 'plan_date',
-			headerName: 'Plan Date',
+			field: 'createdAt',
+			headerName: 'Created At',
 			flex: 1,
+			valueFormatter: (params) => {
+				const dob = formatDate(params);
+				// console.log('🚀 ~ Patients ~ params:', params);
+				return `${dob} G.C`; // Format the phone number as a string
+			},
 		},
 		{
 			field: 'department',
@@ -71,15 +68,11 @@ function ODashboard() {
 			flex: 1,
 		},
 		{
-			field: 'report_date',
-			headerName: 'Report Date',
+			field: 'year',
+			headerName: 'Year',
 			flex: 1,
 		},
-		{
-			field: 'submitted_by',
-			headerName: 'Submitted By',
-			flex: 1,
-		},
+
 		{
 			field: 'actions',
 			headerName: 'Actions',
@@ -87,7 +80,7 @@ function ODashboard() {
 			flex: 1,
 			renderCell: (params) => (
 				<Stack direction="row" width="100%" height="100%" display="flex" alignItems="center">
-					<Button component={Link} variant="outlined" size="small" to={`/offices/plan/${params.row.plan_id}`}>
+					<Button component={Link} variant="outlined" size="small" to={`/offices/plan/${params.row._id}`}>
 						View
 					</Button>
 				</Stack>
@@ -147,7 +140,7 @@ function ODashboard() {
 				</Typography>
 				<DataGridWrapper>
 					<DataGrid
-						getRowId={(row) => row.plan_id}
+						getRowId={(row) => row._id}
 						rows={rows}
 						columns={columns}
 						slots={{ toolbar: CustomToolbar }}
