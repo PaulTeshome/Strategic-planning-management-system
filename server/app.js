@@ -12,22 +12,25 @@ const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config({
-  path: "./.env",
+    path: "./.env",
 });
 
 const limiter = rateLimit({
-  max: 100,
-  windiwMs: 60 * 60 * 10000,
-  message:
-    "Too many requests have been coming in from this IP, please try again in an hour",
+    max: 100,
+    windiwMs: 60 * 60 * 10000,
+    message:
+        "Too many requests have been coming in from this IP, please try again in an hour",
 });
 const methodOverride = require("method-override");
 
 const fileUpload = require("express-fileupload");
-// app.use(function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "http://localhost:4000");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//   next();
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
 // });
 
 // make the pulic folder accessable from the frontend
@@ -38,9 +41,9 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(helmet());
 
 app.use(
-  express.json({
-    limit: "100kb",
-  })
+    express.json({
+        limit: "100kb",
+    })
 );
 
 app.use(xss());
@@ -52,25 +55,24 @@ app.use(methodOverride("_method"));
 app.use(fileUpload());
 
 //Middlewares
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.static("../public"));
 
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+    app.use(morgan("dev"));
 }
 
 app.use("/", limiter);
 
 app.use((req, res, next) => {
-  req.currentTime = new Date().toISOString();
-  next();
+    req.currentTime = new Date().toISOString();
+    next();
 });
-
-
 
 const server = require("http").createServer(app);
 
@@ -80,7 +82,7 @@ const router = require("./routes/routes");
 app.use("/api", router);
 
 app.all("*", (req, res, next) => {
-  next(new APIError(`Can't find ${req.originalUrl} in server plus`, 404));
+    next(new APIError(`Can't find ${req.originalUrl} in server plus`, 404));
 });
 
 app.use(globalErrorHandler);
