@@ -46,11 +46,10 @@ const mainFunctionSchema = new Schema({
 // planData: rows,
 // status -> ['pending', 'requested', 'approved', 'submitted']
 const row = new Schema({
-  year: { type: Number, required: true },
-  department: { type: String, required: false},
-  plan_document: { type: String, default: null },
-  planData: { type: [mainFunctionSchema], default: null },
-  createdAt: { type: Date, default: Date.now },
+  number: { type: String, required: false },
+  main_goal: { type: String, required: false },
+  weight: { type: Number, required: false },
+  main_functions: [mainFunctionSchema],
 });
 
 
