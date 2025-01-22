@@ -9,6 +9,7 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	Typography,
 } from '@mui/material';
 import React from 'react';
 import { tokens } from '../../theme';
@@ -120,7 +121,16 @@ function ViewPlanTable({ columns, rows }) {
 						))}
 					</StyledTableRow>
 				</TableHead>
-				<TableBody>{renderTableRows(rows)}</TableBody>
+				<TableBody>
+					{renderTableRows(rows)}
+					{renderTableRows(rows).length === 0 && (
+						<StyledTableRow>
+							<TableBodyCell colSpan={11}>
+								<Typography textAlign="center">No Plan Submitted yet</Typography>
+							</TableBodyCell>
+						</StyledTableRow>
+					)}
+				</TableBody>
 			</Table>
 		</TableContainer>
 	);
