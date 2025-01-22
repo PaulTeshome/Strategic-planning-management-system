@@ -1,7 +1,12 @@
-import { Button, Grid2, Typography } from '@mui/material';
-import React from 'react';
+import { Button, Grid2, Stack, TextField, Typography, useTheme } from '@mui/material';
+import React, { useState } from 'react';
 import SelectComponent from '../../components/form/SelectComponent';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { tokens } from '../../theme';
+import { vpPlanSchema } from '../../utils/yupSchemas';
+import { useFormik } from 'formik';
+import CreateReportTable from '../../components/tables/CreateReportTable';
+import ReportModal from '../../components/modals/ReportModal';
 
 function OReport() {
 	const theme = useTheme();
@@ -19,14 +24,22 @@ function OReport() {
 
 	const date = new Date();
 
+	const [rows, setRows] = useState(() => {
+		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
+		return storedPlan ? JSON.parse(storedPlan) : [];
+	});
+
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: '',
+			reportData: rows,
 		},
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	const [openReport, setOpenReport] = useState(false);
 
 	return (
 		<Stack
@@ -43,7 +56,7 @@ function OReport() {
 			gap={2}
 		>
 			<Typography variant="h5" component="p" fontWeight="bold">
-				View Plans
+				Insert Reports
 			</Typography>
 			<Grid2
 				container
@@ -99,12 +112,24 @@ function OReport() {
 						Search Plan
 					</Button>
 				</Grid2>
-				<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
+
+				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-						Plan for {values.year}
+						Report for {values.year}
 					</Typography>
 				</Grid2>
 			</Grid2>
+			<Button onClick={() => setOpenReport(true)} variant="text">
+				Open Report
+			</Button>
+			<ReportModal
+				rows={rows}
+				title={`Report for ${values.year}`}
+				open={openReport}
+				onCancel={() => setOpenReport(false)}
+				setRows={setRows}
+				year={values.year}
+			/>
 		</Stack>
 	);
 }

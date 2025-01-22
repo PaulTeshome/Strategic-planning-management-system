@@ -15,7 +15,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { tokens } from '../../theme';
 import { Add, Delete, Save } from '@mui/icons-material';
 import { Formik } from 'formik';
@@ -25,7 +25,7 @@ import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import SelectComponent from '../form/SelectComponent';
 import toast from 'react-hot-toast';
 
-function CreatePlanTable({ rows, setRows, year, planData, setPlanData }) {
+function CreatePlanTable({ rows, setRows, year }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const { user } = useContext(MyContext);
@@ -77,11 +77,6 @@ function CreatePlanTable({ rows, setRows, year, planData, setPlanData }) {
 			'&:hover': { backgroundColor: colors.grey[300] },
 		},
 	}));
-
-	const handleSearch = (e) => {
-		console.log('hello');
-		// console.log('🚀 ~ CreatePlanTable ~ rows:', rows);
-	};
 
 	const handleLocalSave = () => {
 		localStorage.setItem(`plan ${year}`, JSON.stringify(rows));
