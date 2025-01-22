@@ -10,6 +10,7 @@ import { Toaster } from 'react-hot-toast';
 // import withAuth from '../../utils/withAuth';
 import Loader from '../Loader';
 import MainHolder from './MainHolder';
+import SPusers from '../../pages/strategic/SPusers';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 const NotFound = lazy(() => import('../../pages/NotFound'));
@@ -111,6 +112,7 @@ function Layout() {
 			element: (
 				<Route key="/strategic-path" path="/strategic" element={<MainHolder />}>
 					<Route index element={<SPDashboard />} />
+					<Route path="users" element={<SPusers />} />
 					<Route path="plan" element={<SPViewPlans />} />
 					<Route path="plan/:plan_id" element={<SPplan />} />
 					<Route path="report" element={<SPViewReport />} />
