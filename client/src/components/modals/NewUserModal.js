@@ -32,7 +32,7 @@ function NewUserModal({ open, onCancel, title }) {
 		mutationFn: registerUser,
 		mutationKey: ['addUser'],
 		onSuccess: (response) => {
-			// console.log('🚀 ~ AddNewPatient ~ response:', response);
+			console.log('🚀 ~ AddNewPatient ~ response:', response);
 			toast.success(response.message);
 			queryClient.invalidateQueries({ queryKey: ['users'] });
 		},
