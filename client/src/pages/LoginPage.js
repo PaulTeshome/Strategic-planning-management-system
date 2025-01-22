@@ -1,17 +1,78 @@
 import { useTheme } from '@emotion/react';
 import { Box, Button, Divider, Stack, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 import { tokens } from '../theme';
 import AASTULogo from '../assets/AASTU_Logo.svg';
 import { Person } from '@mui/icons-material';
 import PasswordComponent from '../components/form/PasswordComponent';
 import { useFormik } from 'formik';
 import { loginSchema } from '../utils/yupSchemas';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuthApi from '../api/auth';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import MyContext from '../utils/MyContext';
 
 function LoginPage() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
-	const handleLogin = () => {};
+
+	const navigate = useNavigate();
+
+	const { loginUser } = useAuthApi();
+
+	const { updateUser } = useContext(MyContext);
+
+	const loginMutation = useMutation({
+		mutationFn: loginUser,
+		mutationKey: ['login'],
+		onSuccess: (response) => {
+			console.log('🚀 ~ ClinicLoginPage ~ response:', response);
+			toast.success('Welcome!');
+
+			const { id, email, role } = response.user;
+
+			updateUser({ user_name: '', role_id: role, user_id: id });
+
+			switch (role) {
+				case 'vp':
+					navigate('/vp');
+					break;
+				case 'spd':
+					navigate('/strategic');
+
+					break;
+				// case '3':
+				// 	navigate('/doctor');
+				// 	break;
+				default:
+					navigate('/offices');
+			}
+
+			// queryClient.invalidateQueries({ queryKey: ['patients'] });
+		},
+		onError: (error) => {
+			// console.log('🚀 ~ ClinicLoginPage ~ error:', error);
+
+			if (error.response.status === 402) {
+				navigate(`/verify/${error.response.data.package_id}`);
+			} else if (error.response.status === 404) {
+				toast.error('Incorrect Staff Id or password');
+			} else {
+				toast.error(error.response.data.message);
+			}
+		},
+	});
+
+	const handleLogin = (values) => {
+		const { email, password } = values;
+		const data = {
+			email: email,
+			password: password,
+		};
+
+		loginMutation.mutate(data);
+	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
@@ -71,7 +132,7 @@ function LoginPage() {
 					width="50%"
 					component="form"
 					onSubmit={handleSubmit}
-					autoComplete="off"
+					// autoComplete="off"
 					noValidate
 				>
 					<Stack direction="row" display="flex" justifyContent="center" alignItems="center" gap={2}>
