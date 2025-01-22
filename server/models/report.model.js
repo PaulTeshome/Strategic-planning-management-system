@@ -5,36 +5,36 @@ const Schema = mongoose.Schema;
 
 // KPI Schema
 const kpiSchema = new Schema({
-  number: { type: String, required: true },
-  KPI_title: { type: String, required: true },
-  measurement: { type: String, required: true },
-  weight: { type: Number, required: true },
-  past_year: { type: Number, required: true },
-  present_goal: { type: Number, required: true },
-  quarter_1: { type: Number, required: true },
-  quarter_1_progress: { type: Number, required: true },
-  quarter_2: { type: Number, required: true },
-  quarter_2_progress: { type: Number, required: true },
-  quarter_3: { type: Number, required: true },
-  quarter_3_progress: { type: Number, required: true },
-  quarter_4: { type: Number, required: true },
-  quarter_4_progress: { type: Number, required: true },
-  department: { type: String, required: true },
+  number: { type: String, required: false },
+  KPI_title: { type: String, required: false },
+  measurement: { type: String, required: false },
+  weight: { type: Number, required: false },
+  past_year: { type: Number, required: false },
+  present_goal: { type: Number, required: false },
+  quarter_1: { type: Number, required: false },
+  quarter_1_progress: { type: Number, required: false },
+  quarter_2: { type: Number, required: false },
+  quarter_2_progress: { type: Number, required: false },
+  quarter_3: { type: Number, required: false },
+  quarter_3_progress: { type: Number, required: false },
+  quarter_4: { type: Number, required: false },
+  quarter_4_progress: { type: Number, required: false },
+  department: { type: String, required: false },
 });
 
 // Detail Function Schema
 const detailFunctionSchema = new Schema({
-  number: { type: String, required: true },
-  detail_func_title: { type: String, required: true },
-  weight: { type: Number, required: true },
+  number: { type: String, required: false },
+  detail_func_title: { type: String, required: false },
+  weight: { type: Number, required: false },
   KPIs: [kpiSchema],
 });
 
 // Main Function Schema
 const mainFunctionSchema = new Schema({
-  number: { type: String, required: true },
-  main_func_title: { type: String, required: true },
-  weight: { type: Number, required: true },
+  number: { type: String, required: false },
+  main_func_title: { type: String, required: false },
+  weight: { type: Number, required: false },
   detail_functions: [detailFunctionSchema],
 });
 
@@ -56,11 +56,11 @@ const row = new Schema({
 const ReportSchema = new Schema({
   year: {
     type: Number,
-    required: true,
+    required: false,
   },
   department: {
     type: String,
-    required: true,
+    required: false,
   },
   plan_document: {
     type: String,
