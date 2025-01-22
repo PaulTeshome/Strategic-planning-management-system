@@ -221,11 +221,15 @@ function CreateReportTable({ rows, setRows, year }) {
 				parseFloat(item.quarter_2_progress) +
 				parseFloat(item.quarter_3_progress) +
 				parseFloat(item.quarter_4_progress);
+
+			console.log('🚀 ~ renderRow ~ progressSum:', progressSum);
+
 			const goalSum =
 				parseFloat(item.quarter_1) +
 				parseFloat(item.quarter_2) +
 				parseFloat(item.quarter_3) +
 				parseFloat(item.quarter_4);
+			console.log('🚀 ~ renderRow ~ progressSum:', progressSum);
 
 			tableRows.push(
 				<Formik
