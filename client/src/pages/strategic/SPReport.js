@@ -4,17 +4,16 @@ import React, { useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
-import { vpPlanSchema } from '../../utils/yupSchemas';
-import ViewPlanTable from '../../components/tables/ViewPlanTable';
-import { mockPlan } from '../../components/data/mockData';
+import { vpReportSchema } from '../../utils/yupSchemas';
+import ViewReportTable from '../../components/tables/ViewReportTable';
+import { mockReport } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
-function VPplan() {
+function SPReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
-
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	const closeConfirm = () => {
@@ -23,8 +22,8 @@ function VPplan() {
 	const handleApprove = () => {
 		console.log('🚀 ~ handleApprove ~ first:', values);
 	};
-	const handleSearch = () => {};
 
+	const handleSearch = () => {};
 	const date = new Date();
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
@@ -32,7 +31,7 @@ function VPplan() {
 			year: date.getFullYear(),
 			department: '',
 		},
-		validationSchema: vpPlanSchema,
+		validationSchema: vpReportSchema,
 		onSubmit: handleSearch,
 	});
 
@@ -51,7 +50,7 @@ function VPplan() {
 			gap={2}
 		>
 			<Typography variant="h5" component="p" fontWeight="bold">
-				View Plans
+				View Report
 			</Typography>
 			<Grid2
 				container
@@ -104,12 +103,12 @@ function VPplan() {
 				</Grid2>
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
 					<Button type="submit" fullWidth variant="contained" size="large">
-						Search Plan
+						Search Report
 					</Button>
 				</Grid2>
 				<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-						Plan for {values.year}
+						Report for {values.year}
 					</Typography>
 				</Grid2>
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
@@ -123,7 +122,7 @@ function VPplan() {
 						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
 						size="medium"
 					>
-						Approve Plan
+						Approve Report
 					</Button>
 					<ConfirmationModal
 						open={confirmOpen}
@@ -132,13 +131,13 @@ function VPplan() {
 							handleApprove();
 							setConfirmOpen(false);
 						}}
-						title="Approve Plan"
-						message="Are you sure you want to approve this plan?"
+						title="Approve Report"
+						message="Are you sure you want to approve this report?"
 					/>
 				</Grid2>
 			</Grid2>
 
-			<ViewPlanTable
+			<ViewReportTable
 				columns={[
 					{ name: 'Number', colSpan: 1 },
 					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
@@ -146,16 +145,15 @@ function VPplan() {
 					{ name: 'Measurements', colSpan: 1 },
 					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
 					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
-					{ name: 'Quarter 1', colSpan: 1 },
-					{ name: 'Quarter 2', colSpan: 1 },
-					{ name: 'Quarter 3', colSpan: 1 },
-					{ name: 'Quarter 4', colSpan: 1 },
+					{ name: 'Quarter 1 and 2 goal', colSpan: 1 },
+					{ name: 'Quarter 1 and 2 implementation', colSpan: 1 },
+					{ name: 'Quarter 1 and 2 completeness by percentage', colSpan: 1 },
 					{ name: 'Department', colSpan: 1 },
 				]}
-				rows={mockPlan}
+				rows={mockReport}
 			/>
 		</Stack>
 	);
 }
 
-export default VPplan;
+export default SPReport;

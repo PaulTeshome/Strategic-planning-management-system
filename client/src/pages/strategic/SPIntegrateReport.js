@@ -8,7 +8,7 @@ import SelectComponent from '../../components/form/SelectComponent';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
-function VPGenerate() {
+function SPIntegrateReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const date = new Date();
@@ -20,7 +20,7 @@ function VPGenerate() {
 	};
 
 	const handleGenerate = (values) => {
-		console.log('🚀 ~ handleGenerate ~ values:', values);
+		console.log('🚀 ~ handleReportIntegration ~ values:', values);
 	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setFieldValue, submitForm } = useFormik({
@@ -114,7 +114,7 @@ function VPGenerate() {
 					variant="contained"
 					size="large"
 				>
-					Generate Plan
+					Integrate Report
 				</Button>
 			</Grid2>
 			<ConfirmationModal
@@ -124,11 +124,11 @@ function VPGenerate() {
 					submitForm();
 					setConfirmOpen(false);
 				}}
-				title="Generate Plan"
-				message="Are you sure you want to send this plan to each office?"
+				title="Integrate Report"
+				message="Are you sure you want to send this report to vice president?"
 			/>
 		</Grid2>
 	);
 }
 
-export default VPGenerate;
+export default SPIntegrateReport;

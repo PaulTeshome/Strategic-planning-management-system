@@ -11,7 +11,7 @@ import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
-function VPplan() {
+function SPplan() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
@@ -158,4 +158,4 @@ function VPplan() {
 	);
 }
 
-export default VPplan;
+export default SPplan;

@@ -13,11 +13,24 @@ import MainHolder from './MainHolder';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 const NotFound = lazy(() => import('../../pages/NotFound'));
+const ODashboard = lazy(() => import('../../pages/offices/ODashboard'));
+const OPlan = lazy(() => import('../../pages/offices/OPlan'));
+const OReport = lazy(() => import('../../pages/offices/OReport'));
+const OSchedule = lazy(() => import('../../pages/offices/OSchedule'));
+const OFeedback = lazy(() => import('../../pages/offices/OFeedback'));
 const VPDashboard = lazy(() => import('../../pages/president/VPDashboard'));
 const VPGenerate = lazy(() => import('../../pages/president/VPGenerate'));
 const VPplan = lazy(() => import('../../pages/president/VPplan'));
 const VPReport = lazy(() => import('../../pages/president/VPReport'));
 const VPSchedule = lazy(() => import('../../pages/president/VPSchedule'));
+const SPDashboard = lazy(() => import('../../pages/strategic/SPDashboard'));
+const SPIntegratePlan = lazy(() => import('../../pages/strategic/SPIntegratePlan'));
+const SPIntegrateReport = lazy(() => import('../../pages/strategic/SPIntegrateReport'));
+const SPViewPlans = lazy(() => import('../../pages/strategic/SPViewPlans'));
+const SPViewReport = lazy(() => import('../../pages/strategic/SPViewReport'));
+const SPplan = lazy(() => import('../../pages/strategic/SPplan'));
+const SPReport = lazy(() => import('../../pages/strategic/SPReport'));
+const SPSchedule = lazy(() => import('../../pages/strategic/SPSchedule'));
 
 function Layout() {
 	const theme = useTheme();
@@ -56,6 +69,9 @@ function Layout() {
 			dashboard = '/login';
 	}
 
+	console.log('Current user role:', user.r_data);
+	console.log('Navigating to:', dashboard);
+
 	const appRoutes = [
 		{
 			element: <Route key="/login-path" path="/login" element={<Login />} />,
@@ -64,6 +80,19 @@ function Layout() {
 		{
 			element: <Route exact key="/redirect-path" path="/" element={<Navigate to={dashboard} />} />,
 			requiredRole: ['none'],
+		},
+		{
+			element: (
+				<Route key="/office-path" path="/offices" element={<MainHolder />}>
+					<Route index element={<ODashboard />} />
+					<Route path="plan" element={<OPlan />} />
+					<Route path="plan/:plan_id" element={<OPlan />} />
+					<Route path="report" element={<OReport />} />
+					<Route path="schedule" element={<OSchedule />} />
+					<Route path="feedback" element={<OFeedback />} />
+				</Route>
+			),
+			requiredRole: ['vpo', 'av', 'ado', 'rv'],
 		},
 		{
 			element: (
@@ -77,6 +106,21 @@ function Layout() {
 				</Route>
 			),
 			requiredRole: ['vp'],
+		},
+		{
+			element: (
+				<Route key="/strategic-path" path="/strategic" element={<MainHolder />}>
+					<Route index element={<SPDashboard />} />
+					<Route path="plan" element={<SPViewPlans />} />
+					<Route path="plan/:plan_id" element={<SPplan />} />
+					<Route path="report" element={<SPViewReport />} />
+					<Route path="report/:report_id" element={<SPReport />} />
+					<Route path="schedule" element={<SPSchedule />} />
+					<Route path="integrate-plan" element={<SPIntegratePlan />} />
+					<Route path="integrate-report" element={<SPIntegrateReport />} />
+				</Route>
+			),
+			requiredRole: ['spd'],
 		},
 	];
 
@@ -111,13 +155,13 @@ function Layout() {
 						},
 						success: {
 							style: {
-								background: colors.greenAccent[800],
+								background: colors.greenAccent[400],
 								color: colors.black,
 							},
 						},
 						error: {
 							style: {
-								background: colors.redAccent[700],
+								background: colors.redAccent[400],
 								color: colors.black,
 							},
 						},

@@ -19,11 +19,12 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import { Book, CalendarMonth, Logout, MenuOutlined, NextPlan, Notifications } from '@mui/icons-material';
+import { Book, CalendarMonth, Chat, Logout, MenuOutlined, NextPlan, Notifications } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { Link } from 'react-router-dom';
 import useLogout from '../../hooks/useLogout';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 const Topbar = () => {
 	const theme = useTheme();
@@ -62,6 +63,23 @@ const Topbar = () => {
 					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
 					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
 					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<NextPlan />} />
+				</Stack>
+			),
+		},
+		{
+			requiredRole: ['vpo', 'av', 'ado', 'rv'],
+			element: (
+				<Stack key="offi">
+					<NavItem key="/offices/" title="Dashboard" to="/offices/" icon={<FaDashcube />} />
+					<NavItem key="/offices/plan" title="Plan" to="/offices/plan" icon={<Book />} />
+					<NavItem
+						key="/offices/report"
+						title="Report"
+						to="/offices/report"
+						icon={<BarChartOutlinedIcon />}
+					/>
+					<NavItem key="/offices/schedule" title="Schedule" to="/offices/schedule" icon={<CalendarMonth />} />
+					<NavItem key="/offices/feedback" title="Feedback" to="/offices/feedback" icon={<Chat />} />
 				</Stack>
 			),
 		},
@@ -117,7 +135,9 @@ const Topbar = () => {
 							<MenuOutlined />
 						</Button>
 					)}
-
+					<Typography variant="h5" component="h1">
+						{getDepartmentByRole(user.r_data)}
+					</Typography>
 					{matches && (
 						<Menu
 							sx={{

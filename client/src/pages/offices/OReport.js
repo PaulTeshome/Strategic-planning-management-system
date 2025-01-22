@@ -1,17 +1,14 @@
-import { useTheme } from '@emotion/react';
-import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
+import { Button, Grid2, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { tokens } from '../../theme';
-import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
-import { vpPlanSchema } from '../../utils/yupSchemas';
-import ViewPlanTable from '../../components/tables/ViewPlanTable';
-import { mockPlan } from '../../components/data/mockData';
-import { CheckCircle } from '@mui/icons-material';
-import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { tokens } from '../../theme';
+import { vpPlanSchema } from '../../utils/yupSchemas';
+import { useFormik } from 'formik';
+import CreateReportTable from '../../components/tables/CreateReportTable';
+import ReportModal from '../../components/modals/ReportModal';
 
-function VPplan() {
+function OReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
@@ -27,14 +24,22 @@ function VPplan() {
 
 	const date = new Date();
 
+	const [rows, setRows] = useState(() => {
+		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
+		return storedPlan ? JSON.parse(storedPlan) : [];
+	});
+
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: '',
+			reportData: rows,
 		},
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	const [openReport, setOpenReport] = useState(false);
 
 	return (
 		<Stack
@@ -51,7 +56,7 @@ function VPplan() {
 			gap={2}
 		>
 			<Typography variant="h5" component="p" fontWeight="bold">
-				View Plans
+				Insert Reports
 			</Typography>
 			<Grid2
 				container
@@ -107,55 +112,26 @@ function VPplan() {
 						Search Plan
 					</Button>
 				</Grid2>
-				<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
+
+				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-						Plan for {values.year}
+						Report for {values.year}
 					</Typography>
 				</Grid2>
-				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
-					<Button
-						fullWidth
-						onClick={() => {
-							setConfirmOpen(true);
-						}}
-						variant="contained"
-						startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
-						size="medium"
-					>
-						Approve Plan
-					</Button>
-					<ConfirmationModal
-						open={confirmOpen}
-						onCancel={closeConfirm}
-						onConfirm={() => {
-							handleApprove();
-							setConfirmOpen(false);
-						}}
-						title="Approve Plan"
-						message="Are you sure you want to approve this plan?"
-					/>
-				</Grid2>
 			</Grid2>
-
-			<ViewPlanTable
-				columns={[
-					{ name: 'Number', colSpan: 1 },
-					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
-					{ name: 'Weights', colSpan: 1 },
-					{ name: 'Measurements', colSpan: 1 },
-					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
-					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
-					{ name: 'Quarter 1', colSpan: 1 },
-					{ name: 'Quarter 2', colSpan: 1 },
-					{ name: 'Quarter 3', colSpan: 1 },
-					{ name: 'Quarter 4', colSpan: 1 },
-					{ name: 'Department', colSpan: 1 },
-				]}
-				rows={mockPlan}
+			<Button onClick={() => setOpenReport(true)} variant="text">
+				Open Report
+			</Button>
+			<ReportModal
+				rows={rows}
+				title={`Report for ${values.year}`}
+				open={openReport}
+				onCancel={() => setOpenReport(false)}
+				setRows={setRows}
+				year={values.year}
 			/>
 		</Stack>
 	);
 }
 
-export default VPplan;
+export default OReport;

@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
-function VPSchedule() {
+function SPSchedule() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const date = new Date();
@@ -107,4 +107,4 @@ function VPSchedule() {
 	);
 }
 
-export default VPSchedule;
+export default SPSchedule;

@@ -9,6 +9,7 @@ import ViewReportTable from '../../components/tables/ViewReportTable';
 import { mockReport } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function VPReport() {
 	const theme = useTheme();
@@ -93,10 +94,10 @@ function VPReport() {
 						onBlur={handleBlur}
 						options={[
 							{ value: 'all', label: 'All' },
-							{ value: 'academics', label: 'Academics Office' },
-							{ value: 'president', label: 'President Office' },
-							{ value: 'research', label: 'Research Office' },
-							{ value: 'administration', label: 'Administration Office' },
+							{ value: 'av', label: getDepartmentByRole('av') },
+							{ value: 'vpo', label: getDepartmentByRole('vpo') },
+							{ value: 'rv', label: getDepartmentByRole('rv') },
+							{ value: 'ado', label: getDepartmentByRole('ado') },
 						]}
 					/>
 				</Grid2>

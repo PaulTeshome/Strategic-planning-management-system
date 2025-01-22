@@ -1,7 +1,7 @@
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material';
 import React from 'react';
 
-function SelectComponent({ touched, error, label, name, value, onChange, onBlur, options, required }) {
+function SelectComponent({ touched, error, label, name, value, disabled, onChange, onBlur, options, required }) {
 	return (
 		<FormControl fullWidth>
 			<InputLabel id={`${label}-select`} error={touched && Boolean(error)}>
@@ -16,6 +16,7 @@ function SelectComponent({ touched, error, label, name, value, onChange, onBlur,
 				value={value}
 				onChange={onChange}
 				onBlur={onBlur}
+				disabled={disabled}
 				error={touched && Boolean(error)}
 			>
 				{options.map((option, index) => (

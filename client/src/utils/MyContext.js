@@ -14,7 +14,9 @@ export const MyContextProvider = ({ children }) => {
 			return {
 				user_id: '',
 				user_name: '',
-				r_data: 'vp',
+				r_data: 'rv',
+				// r_data: 'spd',
+				// r_data: 'vp',
 			};
 		} else {
 			const parsedUser = JSON.parse(storedUser);
@@ -34,39 +36,37 @@ export const MyContextProvider = ({ children }) => {
 	const updateUser = (newUser) => {
 		const { user_name, role_id, user_id } = newUser;
 
-		let range;
-		let role;
+		// Define ranges for each role
+		const roleRanges = {
+			1: { range: [100, 500], role: 'vp' },
+			2: { range: [501, 700], role: 'spd' },
+			3: { range: [701, 900], role: 'vpo' },
+			4: { range: [901, 1100], role: 'av' },
+			5: { range: [1101, 1300], role: 'ado' },
+			6: { range: [1301, 1500], role: 'rv' },
+		};
 
-		switch (role_id) {
-			case '1':
-				range = [575, 967];
-				role = 'vp';
-				break;
-			case '2':
-				range = [158, 498];
-				role = 'strategic';
-				break;
-			case '3':
-				range = [1045, 1548];
-				role = 'office';
-				break;
-			default:
-				range = [0, 90];
-		}
+		// Default range and role if role_id is invalid
+		const defaultRange = [0, 90];
+		const defaultRole = 'none';
+
+		// Get the range and role based on role_id
+		const { range } = roleRanges[role_id] || { range: defaultRange, role: defaultRole };
 
 		// Generate a random number within the specified range
 		const randomNum = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
 
+		// Create user data object
 		const userData = {
 			user_id: user_id,
 			user_name: user_name,
 			r_data: randomNum,
 		};
 
-		setUser({ ...userData, r_data: role });
+		// Update the user data and persist to local storage
+		setUser(userData);
 		localStorage.setItem('user', JSON.stringify(userData));
 	};
-
 	return (
 		<MyContext.Provider
 			value={{
