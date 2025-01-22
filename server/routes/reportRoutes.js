@@ -1,9 +1,12 @@
 const router = require("express").Router();
-const {
-    generateStrategicPlanReport    
-} = require("../controller/reportController/generateStrategicPlanReport");
+const { createReport, getReport, updateReport, deleteReport, getReportById } = require("../controller/reportController");
 
-// strategic plan report routes
-router.get("/strategicPlan/:id",generateStrategicPlanReport);
+
+// report routes
+router.route("/").post(createReport).get(getReport);
+router.route("/:id").patch(updateReport).delete(deleteReport).get(getReportById);
+
+
+
 
 module.exports = router;
