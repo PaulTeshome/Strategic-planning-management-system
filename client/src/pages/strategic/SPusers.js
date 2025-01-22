@@ -30,13 +30,18 @@ function SPusers() {
 	useEffect(() => {
 		if (getPatientsQuery.status === 'error') {
 			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
-			toast.error(getPatientsQuery.error?.response?.data?.message || getPatientsQuery.error.message);
+			toast.error(
+				getPatientsQuery.error?.response?.data?.message ||
+					getPatientsQuery.error.message ||
+					'Error getting users'
+			);
 		}
 	}, [getPatientsQuery.status, getPatientsQuery.error]);
 
 	useMemo(() => {
 		if (getPatientsQuery.status === 'success') {
-			const patientList = getPatientsQuery.data?.patientList;
+			console.log('🚀 ~ useMemo ~ getPatientsQuery.data:', getPatientsQuery.data.data);
+			const patientList = getPatientsQuery.data?.data?.data;
 			setRows([...patientList]);
 		}
 	}, [getPatientsQuery.status, getPatientsQuery.data]);

@@ -14,7 +14,7 @@ const useAuthApi = () => {
 	};
 
 	const getAllUsers = (data) => {
-		return axios.get('/users/').then((res) => res.data);
+		return axios.get('/users/', { withCredentials: true }).then((res) => res.data);
 	};
 	// const refreshToken = (data) => {
 	// 	return axios.post('/auth/refresh', data, { withCredentials: true }).then((res) => res.data);

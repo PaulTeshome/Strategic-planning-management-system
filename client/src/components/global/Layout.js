@@ -11,6 +11,7 @@ import { Toaster } from 'react-hot-toast';
 import Loader from '../Loader';
 import MainHolder from './MainHolder';
 import SPusers from '../../pages/strategic/SPusers';
+import withAuth from '../../utils/withAuth';
 
 const Login = lazy(() => import('../../pages/LoginPage'));
 const NotFound = lazy(() => import('../../pages/NotFound'));

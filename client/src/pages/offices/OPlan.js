@@ -12,6 +12,9 @@ import MyContext from '../../utils/MyContext';
 import * as yup from 'yup';
 import CreatePlanTable from '../../components/tables/CreatePlanTable';
 import { useParams } from 'react-router-dom';
+import usePlanApi from '../../api/plan';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -19,7 +22,7 @@ const createPlanSchema = yup.object().shape({
 	plan_document: yup
 		.mixed()
 		.nullable() // Allow null
-		.required('Plan document is required') // Make optional
+		// .required('Plan document is required') // Make optional
 		.test(
 			'fileFormat',
 			'Unsupported File Format. Please select a PDF or Word document',
@@ -48,8 +51,30 @@ function OPlan() {
 		setConfirmOpen(false);
 	};
 
+	const { addStrategicPlan } = usePlanApi();
+	const queryClient = useQueryClient();
+
+	const addPlanMut = useMutation({
+		mutationFn: addStrategicPlan,
+		mutationKey: ['addPlan'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success(response.status);
+			queryClient.invalidateQueries({ queryKey: ['plans'] });
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
 	const handlePlanSubmit = (values) => {
-		console.log('🚀 ~ handlePlanSubmit ~ values:', values);
+		const { year, department, plan_document, planData, status } = values;
+		const data = { year: year, department: department, planData: planData, status: status };
+		// console.log('🚀 ~ handlePlanSubmit ~ data:', data);
+
+		addPlanMut.mutate(data);
 	};
 
 	const date = new Date();
@@ -64,7 +89,7 @@ function OPlan() {
 			year: date.getFullYear(),
 			department: user.r_data,
 			plan_document: null,
-			planData: rows,
+			planData: [...rows],
 			status: 'submitted',
 		},
 		validationSchema: createPlanSchema,
