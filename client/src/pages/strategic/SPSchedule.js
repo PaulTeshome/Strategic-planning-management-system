@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import { vpReportSchema } from '../../utils/yupSchemas';
 import dayjs from 'dayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function SPSchedule() {
 	const theme = useTheme();
@@ -79,10 +80,10 @@ function SPSchedule() {
 					onBlur={handleBlur}
 					options={[
 						{ value: 'all', label: 'All' },
-						{ value: 'academics', label: 'Academics Office' },
-						{ value: 'president', label: 'President Office' },
-						{ value: 'research', label: 'Research Office' },
-						{ value: 'administration', label: 'Administration Office' },
+						{ value: 'av', label: getDepartmentByRole('av') },
+						{ value: 'vpo', label: getDepartmentByRole('vpo') },
+						{ value: 'rv', label: getDepartmentByRole('rv') },
+						{ value: 'ado', label: getDepartmentByRole('ado') },
 					]}
 				/>
 				<Button type="submit" fullWidth variant="contained" size="large">

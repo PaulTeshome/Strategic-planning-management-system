@@ -8,6 +8,7 @@ import { vpReportSchema } from '../../utils/yupSchemas';
 import dayjs from 'dayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import MyContext from '../../utils/MyContext';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function OSchedule() {
 	const theme = useTheme();
@@ -82,10 +83,10 @@ function OSchedule() {
 					onBlur={handleBlur}
 					options={[
 						{ value: 'all', label: 'All' },
-						{ value: 'av', label: 'Academic Vice Office' },
-						{ value: 'vpo', label: 'Vice President Office' },
-						{ value: 'rv', label: 'Research Vice Office' },
-						{ value: 'ado', label: 'Administration Vice Office' },
+						{ value: 'av', label: getDepartmentByRole('av') },
+						{ value: 'vpo', label: getDepartmentByRole('vpo') },
+						{ value: 'rv', label: getDepartmentByRole('rv') },
+						{ value: 'ado', label: getDepartmentByRole('ado') },
 					]}
 				/>
 				<Button type="submit" fullWidth variant="contained" size="large">

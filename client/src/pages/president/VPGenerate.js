@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import { generateReportSchema } from '../../utils/yupSchemas';
 import SelectComponent from '../../components/form/SelectComponent';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function VPGenerate() {
 	const theme = useTheme();
@@ -79,10 +80,10 @@ function VPGenerate() {
 					onBlur={handleBlur}
 					options={[
 						{ value: 'all', label: 'All' },
-						{ value: 'av', label: 'Academic Vice Office' },
-						{ value: 'vpo', label: 'Vice President Office' },
-						{ value: 'rv', label: 'Research Vice Office' },
-						{ value: 'ado', label: 'Administration Vice Office' },
+						{ value: 'av', label: getDepartmentByRole('av') },
+						{ value: 'vpo', label: getDepartmentByRole('vpo') },
+						{ value: 'rv', label: getDepartmentByRole('rv') },
+						{ value: 'ado', label: getDepartmentByRole('ado') },
 					]}
 				/>
 				<TextField
