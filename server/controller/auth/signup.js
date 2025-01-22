@@ -36,33 +36,15 @@ exports.signUp = catchAsync(async (req, res, next) => {
   }
 
 
-  //activationToken
-  const activationToken = newUser.createActivationToken();
-
+  newUser.isVerified = true;
   await newUser.save();
 
-  const activationURL = `http://${"localhost:4000"}/activate?token=${activationToken}&email=${email}`;
+  // confirm signup
+  res.status(StatusCodes.CREATED).json({
+    status: "success",
+    data: null,
+  });
 
-  try {
-    await new Email(newUser, activationURL).sendPasswordReset();
-    console.log(activationURL);
-
-    res.status(StatusCodes.CREATED).json({
-      status: "success",
-      message: activationToken,
-    });
-  } catch (err) {
-    newUser.activationToken = undefined;
-    newUser.activationTokenExpires = undefined;
-    await newUser.save({
-      validateBeforeSave: false,
-    });
-
-    return next(
-      new APIError("There was an error sending the email. Try again later!"),
-      500
-    );
-  }
 });
 
 

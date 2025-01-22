@@ -74,8 +74,7 @@ const user = new mongoose.Schema(
     },
     role: {
       type: String,
-      required: false,
-      default: "user",
+      required: true,
       enum: {
         // vice president
         // vice president office
