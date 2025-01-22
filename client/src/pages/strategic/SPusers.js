@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DataGridWrapper from '../../components/global/DataGridWrapper';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Button, Stack, Typography } from '@mui/material';
@@ -7,6 +7,9 @@ import { useTheme } from '@emotion/react';
 import CustomToolbar from '../../components/global/CustomToolbar';
 import { Add } from '@mui/icons-material';
 import NewUserModal from '../../components/modals/NewUserModal';
+import { useQuery } from '@tanstack/react-query';
+import useAuthApi from '../../api/auth';
+import toast from 'react-hot-toast';
 
 function SPusers() {
 	const theme = useTheme();
@@ -14,6 +17,29 @@ function SPusers() {
 	const [openNew, setOpenNew] = useState(false);
 
 	const [rows, setRows] = useState([]);
+
+	const { getAllUsers } = useAuthApi();
+
+	const getPatientsQuery = useQuery({
+		queryKey: ['users'],
+		queryFn: getAllUsers,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPatientsQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
+			toast.error(getPatientsQuery.error?.response?.data?.message || getPatientsQuery.error.message);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.error]);
+
+	useMemo(() => {
+		if (getPatientsQuery.status === 'success') {
+			const patientList = getPatientsQuery.data?.patientList;
+			setRows([...patientList]);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.data]);
 
 	const columns = [
 		{
