@@ -40,13 +40,13 @@ const mainFunctionSchema = new Schema({
 // plan_document: null,
 // planData: rows,
 // status -> ['pending', 'requested', 'approved', 'submitted']
-const row = new Schema({
-  year: { type: Number,  },
-  department: { type: String, required: false},
-  plan_document: { type: String, default: null },
-  planData: { type: [mainFunctionSchema], default: null },
-  createdAt: { type: Date, default: Date.now },
-});
+// const row = new Schema({
+//   year: { type: Number,  },
+//   department: { type: String, required: false},
+//   plan_document: { type: String, default: null },
+//   planData: { type: [mainFunctionSchema], default: null },
+//   createdAt: { type: Date, default: Date.now },
+// });
 
 
 const strategicPlanSchema = new Schema({
@@ -63,7 +63,7 @@ const strategicPlanSchema = new Schema({
     default: null,
   },
   planData: {
-    type: [row],
+    type: [mainFunctionSchema],
     default: [],
   },
   status: {
