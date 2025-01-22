@@ -35,11 +35,46 @@ const mainFunctionSchema = new Schema({
 
 
 // Strategic Plan Schema
+// year: date.getFullYear(),
+// department: user.r_data,
+// plan_document: null,
+// planData: rows,
+// status -> ['pending', 'requested', 'approved', 'submitted']
+const row = new Schema({
+  year: { type: Number, required: true },
+  department: { type: String, required: true },
+  plan_document: { type: String, default: null },
+  planData: { type: [mainFunctionSchema], default: null },
+  createdAt: { type: Date, default: Date.now },
+});
+
+
 const strategicPlanSchema = new Schema({
-  number: { type: String, required: true },
-  main_goal: { type: String, required: true },
-  weight: { type: Number, required: true },
-  main_functions: [mainFunctionSchema],
+  year: {
+    type: Number,
+    required: true,
+  },
+  department: {
+    type: String,
+    required: true,
+  },
+  plan_document: {
+    type: String,
+    default: null,
+  },
+  planData: {
+    type: [row],
+    default: [],
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'requested', 'approved', 'submitted'],
+    default: 'pending',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Create the Model
