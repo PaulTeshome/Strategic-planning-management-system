@@ -41,7 +41,7 @@ const mainFunctionSchema = new Schema({
 // planData: rows,
 // status -> ['pending', 'requested', 'approved', 'submitted']
 const row = new Schema({
-  year: { type: Number, required: true },
+  year: { type: Number,  },
   department: { type: String, required: false},
   plan_document: { type: String, default: null },
   planData: { type: [mainFunctionSchema], default: null },

@@ -155,6 +155,7 @@ exports.deleteMany = (Model, delArr) =>
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
+    console.log(req.body);
     const doc = await Model.create(req.body);
     if (!doc) {
       return next(
