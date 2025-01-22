@@ -65,6 +65,7 @@ function OPlan() {
 			department: user.r_data,
 			plan_document: null,
 			planData: rows,
+			status: 'submitted',
 		},
 		validationSchema: createPlanSchema,
 		onSubmit: handlePlanSubmit,

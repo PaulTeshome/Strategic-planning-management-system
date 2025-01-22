@@ -4,7 +4,7 @@ import { tokens } from '../../theme';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { FaDashcube } from 'react-icons/fa6';
 import MyContext from '../../utils/MyContext';
-import { Book, CalendarMonth, Chat, Logout, NextPlan } from '@mui/icons-material';
+import { Book, CalendarMonth, Chat, Logout, NextPlan, People } from '@mui/icons-material';
 import NavItem from '../NavItem';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useLogout from '../../hooks/useLogout';
@@ -47,6 +47,7 @@ const Sidebar = () => {
 			element: (
 				<Fragment key="strac">
 					<NavItem key="/strategic/" title="Dashboard" to="/strategic/" icon={<FaDashcube />} />
+
 					<NavItem key="/strategic/plan" title="Plan" to="/strategic/plan" icon={<Book />} />
 					<NavItem
 						key="/strategic/report"
@@ -72,6 +73,7 @@ const Sidebar = () => {
 						to="/strategic/integrate-report"
 						icon={<NextPlan />}
 					/>
+					<NavItem key="/strategic/users" title="Users" to="/strategic/users" icon={<People />} />
 				</Fragment>
 			),
 		},

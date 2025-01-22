@@ -3,7 +3,7 @@ import * as yup from 'yup';
 // const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 // const phoneRegExp = /^\d{9}$/;
 
-// const phoneRegExp = /^[97]\d{8}$/;
+const phoneRegExp = /^[97]\d{8}$/;
 // const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
 export const loginSchema = yup.object().shape({
@@ -19,6 +19,14 @@ export const vpPlanSchema = yup.object().shape({
 export const vpReportSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
 	department: yup.string().required('Department is required'),
+});
+
+export const userAddSchema = yup.object().shape({
+	first_name: yup.string().required('required'),
+	last_name: yup.string().required('required'),
+	role: yup.string().required('required'),
+	email: yup.string().email('invalid email').required('required'),
+	phone: yup.string().matches(phoneRegExp, 'Phone number is not valid').required('required'),
 });
 
 export const generateReportSchema = yup.object().shape({
