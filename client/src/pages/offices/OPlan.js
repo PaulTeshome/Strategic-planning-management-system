@@ -71,8 +71,14 @@ function OPlan() {
 
 	const handlePlanSubmit = (values) => {
 		const { year, department, plan_document, planData, status } = values;
-		const data = { year: year, department: department, planData: planData, status: status };
-		// console.log('🚀 ~ handlePlanSubmit ~ data:', data);
+		const data = {
+			year: year,
+			department: department,
+			plan_document: plan_document,
+			planData: planData,
+			status: status,
+		};
+		console.log('🚀 ~ handlePlanSubmit ~ data:', data);
 
 		addPlanMut.mutate(data);
 	};
