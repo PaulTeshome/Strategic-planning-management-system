@@ -26,7 +26,7 @@ function VPplan() {
 	const { getPlan, getBy } = usePlanApi();
 
 	const getPatientsQuery = useQuery({
-		queryKey: ['plan', plan_id],
+		queryKey: ['plan', plan_id, 'requested'],
 		enabled: plan_id !== undefined && plan_id !== null,
 		queryFn: getPlan,
 		staleTime: 1000 * 60 * 5,
