@@ -15,15 +15,15 @@ export const MyContextProvider = ({ children }) => {
 				user_id: '',
 				user_name: '',
 				// r_data: 'rv',
-				r_data: 'spd',
+				r_data: '',
 				// r_data: 'vp',
 			};
 		} else {
 			const parsedUser = JSON.parse(storedUser);
 
-			const role = roleSetter(parsedUser);
+			// const role = roleSetter(parsedUser);
 
-			const savedState = { ...parsedUser, r_data: role };
+			const savedState = { ...parsedUser };
 
 			return savedState;
 		}

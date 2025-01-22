@@ -165,15 +165,15 @@ function CreatePlanTable({ rows, setRows, year }) {
 	};
 
 	const addKPI = (kpi, detailNumber) => {
-		// console.log('🚀 ~ addKPI ~ detailNumber:', detailNumber);
+		// // console.log('🚀 ~ addKPI ~ detailNumber:', detailNumber);
 		const kpiNumber = kpi.length + 1;
 		const [goalNumber, functionNumber] = detailNumber.split('.');
-		// console.log(
-		// '🚀 ~ addKPI ~ goalNumber, functionNumber, detailNumber:',
-		// goalNumber,
-		// functionNumber,
-		// detailNumber
-		// );
+		// // console.log(
+		// // '🚀 ~ addKPI ~ goalNumber, functionNumber, detailNumber:',
+		// // goalNumber,
+		// // functionNumber,
+		// // detailNumber
+		// // );
 		const newKPI = {
 			number: detailNumber + '.' + kpiNumber,
 			KPI_title: '',
@@ -266,10 +266,10 @@ function CreatePlanTable({ rows, setRows, year }) {
 							...goal,
 							main_functions: goal.main_functions.map((main) => {
 								if (main.number === goalNumber + '.' + functionNumber) {
-									console.log(
-										'🚀 ~ main_functions:goal.main_functions.map ~ functionNumber:',
-										functionNumber
-									);
+									// console.log(
+									// '🚀 ~ main_functions:goal.main_functions.map ~ functionNumber:',
+									// functionNumber
+									// );
 									return {
 										...main,
 										detail_functions: main.detail_functions.filter(
@@ -369,13 +369,13 @@ function CreatePlanTable({ rows, setRows, year }) {
 
 			const TitleFieldLabel = textLabel + ' Title ' + item.number;
 			const TitleFieldName = textName + '_' + item.number.replace(/\./g, '_');
-			console.log('🚀 ~ renderRow ~ textName:', textName);
+			// console.log('🚀 ~ renderRow ~ textName:', textName);
 			const WeightFieldLabel = textLabel + ' Weight ' + item.number;
 			const WeightFieldName = textName + '_weight_' + item.number.replace(/\./g, '_');
 
 			const handleRowSubmit = (value) => {
-				// console.log('🚀 ~ handleRowSubmit ~ value:', value);
-				// console.log('🚀 ~ handleRowSubmit ~ value:', rows);
+				// // console.log('🚀 ~ handleRowSubmit ~ value:', value);
+				// // console.log('🚀 ~ handleRowSubmit ~ value:', rows);
 			};
 
 			const KPIinitials = isKPI
@@ -402,7 +402,7 @@ function CreatePlanTable({ rows, setRows, year }) {
 					}
 				: {};
 
-			console.log('🚀 ~ renderRow ~ ', item);
+			// console.log('🚀 ~ renderRow ~ ', item);
 
 			tableRows.push(
 				<Formik
@@ -570,7 +570,7 @@ function CreatePlanTable({ rows, setRows, year }) {
 											}}
 											onClick={() => {
 												const num = item.number.split('.');
-												// console.log('🚀 ~ renderRow ~ num:', num);
+												// // console.log('🚀 ~ renderRow ~ num:', num);
 												removeDetail(num[0], num[1], item.number);
 											}}
 										/>
@@ -737,8 +737,8 @@ function CreatePlanTable({ rows, setRows, year }) {
 												}}
 												onClick={() => {
 													const num = item.number.split('.');
-													console.log('🚀 ~ renderRow ~ num:', num);
-													console.log('🚀 ~ renderRow ~ num:', item);
+													// console.log('🚀 ~ renderRow ~ num:', num);
+													// console.log('🚀 ~ renderRow ~ num:', item);
 													removeKPI(num[0], num[1], num[2], item.number);
 												}}
 											/>

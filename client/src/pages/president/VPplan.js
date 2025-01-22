@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -10,12 +10,46 @@ import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import usePlanApi from '../../api/plan';
+import toast from 'react-hot-toast';
 
 function VPplan() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [rows, setRows] = useState([]);
+
+	const { plan_id } = useParams();
+	const { getPlan } = usePlanApi();
+
+	const getPatientsQuery = useQuery({
+		queryKey: ['plan', plan_id],
+		queryFn: getPlan,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPatientsQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
+			toast.error(
+				getPatientsQuery.error?.response?.data?.message ||
+					getPatientsQuery.error.message ||
+					'Error getting plans'
+			);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.error]);
+
+	useMemo(() => {
+		if (getPatientsQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlans', getPatientsQuery.data?.data?.data[0]);
+			const patientList = getPatientsQuery.data?.data?.data[0].planData;
+			setRows([...patientList]);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.data]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
@@ -152,7 +186,7 @@ function VPplan() {
 					{ name: 'Quarter 4', colSpan: 1 },
 					{ name: 'Department', colSpan: 1 },
 				]}
-				rows={mockPlan}
+				rows={rows}
 			/>
 		</Stack>
 	);

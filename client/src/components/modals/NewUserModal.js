@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import SelectComponent from '../form/SelectComponent';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import PasswordComponent from '../form/PasswordComponent';
 
 function NewUserModal({ open, onCancel, title }) {
 	const theme = useTheme();
@@ -32,9 +33,10 @@ function NewUserModal({ open, onCancel, title }) {
 		mutationFn: registerUser,
 		mutationKey: ['addUser'],
 		onSuccess: (response) => {
-			console.log('🚀 ~ AddNewPatient ~ response:', response);
-			toast.success(response.message);
+			// console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success(response.status);
 			queryClient.invalidateQueries({ queryKey: ['users'] });
+			onCancel();
 		},
 		onError: (error) => {
 			// console.log('🚀 ~ AddNewPatient ~ error:', error);
@@ -44,14 +46,16 @@ function NewUserModal({ open, onCancel, title }) {
 	});
 
 	const handleCustomerAdd = (values) => {
-		const { first_name, last_name, phone, role, email } = values;
+		const { first_name, last_name, phone, role, email, password, confirm_password } = values;
 
 		const data = {
 			firstName: first_name,
 			lastName: last_name,
 			role: role,
 			email: email,
-			phone: phone,
+			phone: parseInt(phone),
+			password: password,
+			passwordConfirm: confirm_password,
 		};
 
 		createUserMutation.mutate(data);
@@ -64,6 +68,8 @@ function NewUserModal({ open, onCancel, title }) {
 			phone: '',
 			email: '',
 			role: '',
+			password: '',
+			confirm_password: '',
 		},
 
 		validationSchema: userAddSchema,
@@ -188,6 +194,41 @@ function NewUserModal({ open, onCancel, title }) {
 								{ value: 'ado', label: getDepartmentByRole('ado') },
 								{ value: 'vp', label: getDepartmentByRole('vp') },
 							]}
+						/>
+					</Grid2>
+					<Grid2 size={{ xs: 12, md: 5.8 }}>
+						<PasswordComponent
+							fullWidth
+							required={true}
+							variant="outlined"
+							type="text"
+							label="Password"
+							onBlur={customerFormik.handleBlur}
+							onChange={customerFormik.handleChange}
+							value={customerFormik.values.password}
+							name="password"
+							error={customerFormik.touched.password && Boolean(customerFormik.errors.password)}
+							helperText={customerFormik.touched.password && customerFormik.errors.password}
+						/>
+					</Grid2>
+					<Grid2 size={{ xs: 12, md: 5.8 }}>
+						<PasswordComponent
+							fullWidth
+							required={true}
+							variant="outlined"
+							type="text"
+							label="Confirm Password"
+							onBlur={customerFormik.handleBlur}
+							onChange={customerFormik.handleChange}
+							value={customerFormik.values.confirm_password}
+							name="confirm_password"
+							error={
+								customerFormik.touched.confirm_password &&
+								Boolean(customerFormik.errors.confirm_password)
+							}
+							helperText={
+								customerFormik.touched.confirm_password && customerFormik.errors.confirm_password
+							}
 						/>
 					</Grid2>
 

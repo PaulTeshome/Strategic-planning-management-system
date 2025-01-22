@@ -27,6 +27,17 @@ export const userAddSchema = yup.object().shape({
 	role: yup.string().required('required'),
 	email: yup.string().email('invalid email').required('required'),
 	phone: yup.string().matches(phoneRegExp, 'Phone number is not valid').required('required'),
+	password: yup
+		.string()
+		// .matches(passwordRules, {
+		// 	message:
+		// 		'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one digit.',
+		// })
+		.required(' required'), //make strong password
+	confirm_password: yup
+		.string()
+		.oneOf([yup.ref('password'), null], 'Passwords must match')
+		.required('required'),
 });
 
 export const generateReportSchema = yup.object().shape({
