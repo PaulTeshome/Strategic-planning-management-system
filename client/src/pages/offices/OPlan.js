@@ -360,9 +360,11 @@ function OPlan() {
 					</Typography>
 				</Grid2>
 				{feedbacks.length === 0 && (
-					<Typography variant="body2" component="p" color={colors.textBlue[500]}>
-						No feedbacks given
-					</Typography>
+					<Grid2 size={{ xs: 12 }} pl={2} display="flex" maxHeight="fit-content">
+						<Typography variant="body2" component="p" color={colors.textBlue[500]}>
+							No feedbacks given
+						</Typography>
+					</Grid2>
 				)}
 				{feedbacks.map((feedback) => (
 					<Grid2
