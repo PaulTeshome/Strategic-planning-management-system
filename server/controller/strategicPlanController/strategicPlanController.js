@@ -16,10 +16,13 @@ const createStrategicPlan = catchAsync(async (req, res, next) => {
 
     const {department, year} = plan
 
-    console.log(department, year, 'here')
-
     // check if the department and year already exists
     const plancheck = await strategicPlanModel.findOne({department, year});
+
+    // the plan main goal cannot be higher than 100
+    // the plan main function must not be higher than the main goal
+    // the detail goals added up should not be higher than the main function
+    // the detail goals added up should be equal to the main function
 
     if (plancheck) {
         return next(new APIError('Plan already exists', StatusCodes.BAD_REQUEST))

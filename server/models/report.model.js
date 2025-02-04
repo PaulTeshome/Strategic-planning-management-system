@@ -75,10 +75,30 @@ const ReportSchema = new Schema({
     enum: ['pending', 'requested', 'approved', 'submitted'],
     default: 'pending',
   },
-  DueDate: {
+  // DueDate: {
+  //   type: Date,
+  //   default: Date.now,
+  // },
+  // quarter one due date, quater two due date, quarter three due date, quarter four due date
+
+
+  quater_1_due_date: {
     type: Date,
     default: Date.now,
   },
+  quater_2_due_date: {
+    type: Date,
+    default: Date.now,
+  },
+  quater_3_due_date: {
+    type: Date,
+    default: Date.now,
+  },
+  quater_4_due_date: {
+    type: Date,
+    default: Date.now,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
