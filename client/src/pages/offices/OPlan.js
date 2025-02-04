@@ -16,6 +16,7 @@ import usePlanApi from '../../api/plan';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import InfoToast from '../../components/InfoToast';
+import useFeedbackApi from '../../api/feedback';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -45,12 +46,52 @@ function OPlan() {
 	const { plan_id } = useParams();
 	const date = new Date();
 
+	const [update, setUpdate] = useState(false);
+
 	const [rows, setRows] = useState(() => {
 		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
 		return storedPlan ? JSON.parse(storedPlan) : [];
 	});
+	const [feedbacks, setFeedbacks] = useState([]);
 
 	const { getPlan, addStrategicPlan, updatePlan } = usePlanApi();
+	const { getAllFeedbacks } = useFeedbackApi();
+
+	const getFeedbackQuery = useQuery({
+		queryKey: ['feedback', plan_id],
+		enabled: plan_id !== undefined && plan_id !== null,
+		queryFn: getAllFeedbacks,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getFeedbackQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getFeedbackQuery.error:', getFeedbackQuery.error);
+			toast.custom(
+				<InfoToast
+					message={
+						getFeedbackQuery.error?.response?.data?.message ||
+						getFeedbackQuery.error.message ||
+						'Error getting plan'
+					}
+				/>,
+				{
+					id: 'get feedback',
+				}
+			);
+		}
+	}, [getFeedbackQuery.status, getFeedbackQuery.error]);
+
+	useMemo(() => {
+		if (getFeedbackQuery.status === 'success') {
+			// console.log('🚀 ~ useMemo ~ getFeedbackQuery', getFeedbackQuery.data);
+			const planData = getFeedbackQuery.data?.data?.data || [];
+			// console.log('🚀 ~ useMemo ~ planData:', planData);
+
+			setFeedbacks([...planData]);
+		}
+	}, [getFeedbackQuery.status, getFeedbackQuery.data]);
 
 	const getPlanQuery = useQuery({
 		queryKey: ['plan', plan_id, 'pending'],
@@ -77,8 +118,6 @@ function OPlan() {
 			);
 		}
 	}, [getPlanQuery.status, getPlanQuery.error]);
-
-	const [update, setUpdate] = useState(false);
 
 	useMemo(() => {
 		if (getPlanQuery.status === 'success') {
@@ -192,7 +231,7 @@ function OPlan() {
 			<Grid2
 				container
 				display="flex"
-				justifyContent="center"
+				justifyContent="flex-start"
 				alignItems="center"
 				width="100%"
 				gap={1}
@@ -311,10 +350,37 @@ function OPlan() {
 				</Grid2>
 
 				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
-					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
+					<Typography variant="h6" component="p" fontWeight="bold" color={colors.textBlue[500]}>
 						Plan for {planFormik.values.year}
 					</Typography>
 				</Grid2>
+				<Grid2 size={{ xs: 12 }} pl={2} display="flex" maxHeight="fit-content">
+					<Typography variant="body1" component="p" color={colors.redAccent[500]}>
+						Feedbacks
+					</Typography>
+				</Grid2>
+				{feedbacks.length === 0 && (
+					<Typography variant="body2" component="p" color={colors.textBlue[500]}>
+						No feedbacks given
+					</Typography>
+				)}
+				{feedbacks.map((feedback) => (
+					<Grid2
+						size={{ xs: 3.8 }}
+						border={1.5}
+						borderRadius={1}
+						borderColor={colors.redAccent[400]}
+						bgcolor={colors.redAccent[700]}
+						p={1}
+						display="flex"
+						maxHeight="fit-content"
+						minHeight={100}
+					>
+						<Typography variant="body2" component="p" color={colors.textBlue[500]}>
+							{feedback.message}
+						</Typography>
+					</Grid2>
+				))}
 			</Grid2>
 
 			<CreatePlanTable rows={rows} setRows={setRows} year={planFormik.values.year} />
