@@ -76,6 +76,11 @@ function ODashboard() {
 			headerName: 'Year',
 			flex: 1,
 		},
+		{
+			field: 'status',
+			headerName: 'Status',
+			flex: 1,
+		},
 
 		{
 			field: 'actions',
