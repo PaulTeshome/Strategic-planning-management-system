@@ -62,7 +62,7 @@ function OFeedback() {
 				</Typography>
 			</Grid2>
 			{feedbacks.map((feedback, index) => (
-				<Grid2 key={index} size={{ xs: 10 }}>
+				<Grid2 key={index} size={{ xs: 12 }}>
 					<FeedbackCard
 						plan_id={feedback.plan_id}
 						user_id={feedback.user_id}

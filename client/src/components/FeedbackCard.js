@@ -74,7 +74,7 @@ function FeedbackCard({ plan_id, user_id, message, createdAt }) {
 			border={1.5}
 			borderRadius={1}
 			borderColor={colors.redAccent[400]}
-			bgcolor={colors.redAccent[700]}
+			bgcolor={colors.aastuGold[200]}
 			p={1}
 			display="flex"
 			maxHeight="fit-content"
