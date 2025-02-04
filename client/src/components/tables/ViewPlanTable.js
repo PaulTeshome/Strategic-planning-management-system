@@ -124,7 +124,7 @@ function ViewPlanTable({ columns, rows }) {
 				<TableBody>
 					{renderTableRows(rows)}
 					{renderTableRows(rows).length === 0 && (
-						<StyledTableRow>
+						<StyledTableRow sx={{ height: 150 }}>
 							<TableBodyCell colSpan={11}>
 								<Typography textAlign="center">No Plan is Requested for approval yet</Typography>
 							</TableBodyCell>
