@@ -165,7 +165,7 @@ function Layout() {
 						error: {
 							style: {
 								background: colors.redAccent[400],
-								color: colors.black,
+								color: colors.white,
 							},
 						},
 					}}
