@@ -23,10 +23,11 @@ function VPplan() {
 	const [rows, setRows] = useState([]);
 
 	const { plan_id } = useParams();
-	const { getPlan } = usePlanApi();
+	const { getPlan, getBy } = usePlanApi();
 
 	const getPatientsQuery = useQuery({
-		queryKey: ['plan', plan_id],
+		queryKey: ['plan', plan_id, 'requested'],
+		enabled: plan_id !== undefined && plan_id !== null,
 		queryFn: getPlan,
 		staleTime: 1000 * 60 * 5,
 		// retry: false,
@@ -45,8 +46,8 @@ function VPplan() {
 
 	useMemo(() => {
 		if (getPatientsQuery.status === 'success') {
-			console.log('🚀 ~ useMemo ~ getPlans', getPatientsQuery.data?.data?.data[0]);
-			const patientList = getPatientsQuery.data?.data?.data[0].planData;
+			console.log('🚀 ~ useMemo ~ getPlan', getPatientsQuery.data);
+			const patientList = getPatientsQuery.data?.data?.data[0]?.planData || [];
 			setRows([...patientList]);
 		}
 	}, [getPatientsQuery.status, getPatientsQuery.data]);
@@ -57,9 +58,15 @@ function VPplan() {
 	const handleApprove = () => {
 		console.log('🚀 ~ handleApprove ~ first:', values);
 	};
-	const handleSearch = () => {};
 
 	const date = new Date();
+	const [search, setSearch] = useState(false);
+
+	const handleSearch = (values) => {
+		const { year, department } = values;
+		console.log('🚀 ~ handleSearch ~ year:', typeof year);
+		setSearch(true);
+	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
@@ -69,6 +76,31 @@ function VPplan() {
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	const getByYearnDeptQ = useQuery({
+		queryKey: ['plan', values.year, values.department, 'requested'],
+		enabled: search,
+		queryFn: getBy,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getByYearnDeptQ.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getByYearnDeptQ.error:', getByYearnDeptQ.error);
+			toast.error(
+				getByYearnDeptQ.error?.response?.data?.message || getByYearnDeptQ.error.message || 'Error getting plans'
+			);
+		}
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.error]);
+
+	useMemo(() => {
+		if (getByYearnDeptQ.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getByYearnDeptQ.data);
+			const patientList = getByYearnDeptQ.data?.data?.data[0]?.planData || [];
+			setRows([...patientList]);
+		}
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.data]);
 
 	return (
 		<Stack

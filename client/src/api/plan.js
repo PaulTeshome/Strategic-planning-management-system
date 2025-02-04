@@ -10,9 +10,11 @@ const usePlanApi = () => {
 	};
 
 	const getPlan = ({ queryKey }) => {
-		const [, plan_id] = queryKey;
+		const [, plan_id, status] = queryKey;
 
-		return axios.get(`/strategicPlan/${plan_id}`, { withCredentials: true }).then((res) => res.data);
+		return axios
+			.get(`/strategicPlan?_id=${plan_id}&status=${status}`, { withCredentials: true })
+			.then((res) => res.data);
 	};
 	const getAllPlans = ({ queryKey }) => {
 		return axios.get('/strategicPlan/', { withCredentials: true }).then((res) => res.data);
@@ -20,9 +22,19 @@ const usePlanApi = () => {
 
 	const getBy = ({ queryKey }) => {
 		const [, year, department, status] = queryKey;
-		return axios
-			.get(`/strategicPlan?year=${year}&status=${status}&department=${department}`, { withCredentials: true })
-			.then((res) => res.data);
+
+		let query = '';
+
+		if (year !== null) {
+			query = query + `year=${year}&`;
+		}
+		if (department !== null) {
+			query = query + `department=${department}&`;
+		}
+		if (status !== null) {
+			query = query + `status=${status}`;
+		}
+		return axios.get(`/strategicPlan?${query}`, { withCredentials: true }).then((res) => res.data);
 	};
 	// const refreshToken = (data) => {
 	// 	return axios.post('/auth/refresh', data, { withCredentials: true }).then((res) => res.data);
