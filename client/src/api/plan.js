@@ -12,10 +12,12 @@ const usePlanApi = () => {
 
 	const getPlan = ({ queryKey }) => {
 		const [, plan_id, status] = queryKey;
+		let query = '';
 
-		return axios
-			.get(`/strategicPlan?_id=${plan_id}&status=${status}`, { withCredentials: true })
-			.then((res) => res.data);
+		if (status !== null) {
+			query = query + `&status=${status}`;
+		}
+		return axios.get(`/strategicPlan?_id=${plan_id}${query}`, { withCredentials: true }).then((res) => res.data);
 	};
 
 	const getAllPlans = ({ queryKey }) => {
