@@ -22,12 +22,12 @@ const fileUpload =
         StatusCodes.BAD_REQUEST
       );
     }
-    console.log("upp");
     const newFileName = name + path.extname(file.name); // You can generate a new name however you like
+
 
     const imagePath = path.join(
       __dirname,
-      `../../public/uploads/` + `${filePath}/` + `${newFileName}`
+      `../public/uploads/` + `${filePath}/` + `${newFileName}`
     );
     await file.mv(imagePath);
 
