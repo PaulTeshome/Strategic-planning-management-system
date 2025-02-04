@@ -7,6 +7,7 @@ const APIError = require("../../utils/apiError");
 const catchAsync = require("../../utils/catchAsync");
 const { fileUpload } = require("../../utils/fileUpload");
 const { YearlyPlan } = require("../../models/yearly.plan.model");
+const { getOne, getAll } = require("../handlerFactory");
 
 
 // upload location
@@ -44,3 +45,7 @@ exports.uploadYearlyPlan = catchAsync(async (req, res, next) => {
         },
     });
 })
+
+
+exports.getYearlyPlan = getOne(YearlyPlan)
+exports.getAllYearlyPlan = getAll(YearlyPlan)
