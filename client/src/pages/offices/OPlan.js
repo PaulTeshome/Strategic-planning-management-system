@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -13,8 +13,9 @@ import * as yup from 'yup';
 import CreatePlanTable from '../../components/tables/CreatePlanTable';
 import { useParams } from 'react-router-dom';
 import usePlanApi from '../../api/plan';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import InfoToast from '../../components/InfoToast';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -42,16 +43,62 @@ function OPlan() {
 	const { user } = useContext(MyContext);
 	const colors = tokens(theme.palette.mode);
 	const { plan_id } = useParams();
+	const date = new Date();
 
-	const [plan, setPlan] = useState({ plan_id: plan_id });
+	const [rows, setRows] = useState(() => {
+		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
+		return storedPlan ? JSON.parse(storedPlan) : [];
+	});
+
+	const { getPlan, addStrategicPlan, updatePlan } = usePlanApi();
+
+	const getPlanQuery = useQuery({
+		queryKey: ['plan', plan_id, 'pending'],
+		enabled: plan_id !== undefined && plan_id !== null,
+		queryFn: getPlan,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.custom(
+				<InfoToast
+					message={
+						getPlanQuery.error?.response?.data?.message ||
+						getPlanQuery.error.message ||
+						'Error getting plan'
+					}
+				/>,
+				{
+					id: 'getPlan',
+				}
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	const [update, setUpdate] = useState(false);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
+			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+			if (planData.length > 0) {
+				setUpdate(true);
+			}
+			setRows([...planData]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [confirmUpdate, setConfirmUpdate] = useState(false);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
+		setConfirmUpdate(false);
 	};
 
-	const { addStrategicPlan } = usePlanApi();
 	const queryClient = useQueryClient();
 
 	const addPlanMut = useMutation({
@@ -69,6 +116,36 @@ function OPlan() {
 		},
 	});
 
+	const updatePlanMut = useMutation({
+		mutationFn: updatePlan,
+		mutationKey: ['updatePlan'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success('Update ' + response.status);
+			queryClient.invalidateQueries({ queryKey: ['plans'] });
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handlePlanUpdate = () => {
+		const { year, department, plan_document, planData } = planFormik.values;
+		const data = {
+			year: year,
+			department: department,
+			plan_document: plan_document,
+			planData: planData,
+			status: 'submitted',
+			plan_id: plan_id,
+		};
+		console.log('🚀 ~ handlePlanUpdate ~ data:', data);
+
+		updatePlanMut.mutate(data);
+	};
+
 	const handlePlanSubmit = (values) => {
 		const { year, department, plan_document, planData, status } = values;
 		const data = {
@@ -82,13 +159,6 @@ function OPlan() {
 
 		addPlanMut.mutate(data);
 	};
-
-	const date = new Date();
-
-	const [rows, setRows] = useState(() => {
-		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
-		return storedPlan ? JSON.parse(storedPlan) : [];
-	});
 
 	const planFormik = useFormik({
 		initialValues: {
@@ -132,16 +202,42 @@ function OPlan() {
 				noValidate
 			>
 				<Grid2 size={{ xs: 12 }} display="flex" alignItems="flex-end" pl="85%" maxHeight="fit-content">
-					<Button
-						onClick={() => {
-							setConfirmOpen(true);
+					{update ? (
+						<Button
+							onClick={() => {
+								setConfirmUpdate(true);
+							}}
+							fullWidth
+							variant="contained"
+							size="large"
+						>
+							Update Plan
+						</Button>
+					) : (
+						<Button
+							onClick={() => {
+								setConfirmOpen(true);
+							}}
+							fullWidth
+							variant="contained"
+							size="large"
+						>
+							Submit Plan
+						</Button>
+					)}
+
+					<ConfirmationModal
+						open={confirmUpdate}
+						onCancel={closeConfirm}
+						onConfirm={() => {
+							planFormik.validateForm();
+							handlePlanUpdate();
+							setConfirmUpdate(false);
 						}}
-						fullWidth
-						variant="contained"
-						size="large"
-					>
-						Submit Plan
-					</Button>
+						title="Update Plan"
+						message="Are you sure you want to update this plan?"
+					/>
+
 					<ConfirmationModal
 						open={confirmOpen}
 						onCancel={closeConfirm}
