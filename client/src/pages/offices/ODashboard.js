@@ -66,6 +66,10 @@ function ODashboard() {
 			field: 'department',
 			headerName: 'Department',
 			flex: 1,
+			valueFormatter: (params) => {
+				const deptName = getDepartmentByRole(params);
+				return deptName;
+			},
 		},
 		{
 			field: 'year',
