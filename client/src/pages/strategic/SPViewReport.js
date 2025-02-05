@@ -18,11 +18,11 @@ function SPViewReport() {
 
 	const [rows, setRows] = useState([]);
 
-	const { getAllReports } = useReportApi();
+	const { getRBy } = useReportApi();
 
 	const getPatientsQuery = useQuery({
-		queryKey: ['reports'],
-		queryFn: getAllReports,
+		queryKey: ['reports', null, null, 'submitted'],
+		queryFn: getRBy,
 		staleTime: 1000 * 60 * 5,
 		// retry: false,
 	});

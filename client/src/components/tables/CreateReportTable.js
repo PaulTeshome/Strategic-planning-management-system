@@ -27,25 +27,28 @@ import toast from 'react-hot-toast';
 import useReportApi from '../../api/report';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ConfirmationModal from '../modals/ConfirmationModal';
+import usePlanApi from '../../api/plan';
 
-function CreateReportTable({ rows, onCancel, setRows, year }) {
+function CreateReportTable({ rows, onCancel, setRows, year, reportData }) {
+	console.log('🚀 ~ CreateReportTable ~ rows:', rows);
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const { user } = useContext(MyContext);
 
-	const { getBy, addReport, updateReport } = useReportApi();
+	const { getBy } = usePlanApi();
+	const { addReport, updateReport } = useReportApi();
 	const queryClient = useQueryClient();
-	const [update, setUpdate] = useState(false);
+	const [update, setUpdate] = useState(true);
 
-	const [reportData, setReportData] = useState({});
-	const [rowData, setRowData] = useState([]);
+	// const [rows, setrows] = useState([]);
 
 	const getByYearnDeptQ = useQuery({
 		// queryKey: ['report', year, user.r_data, 'submitted'],
-		queryKey: ['report', year, user.r_data, 'approved'],
+		queryKey: ['plan', year, user.r_data, 'approved'],
 		queryFn: getBy,
 		staleTime: 1000 * 60 * 5,
 		retry: false,
+		enabled: rows.length === 0,
 	});
 
 	useEffect(() => {
@@ -62,13 +65,13 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 			// // console.log('🚀 ~ useMemo ~ getReport', getByYearnDeptQ.data);
 			const planData = getByYearnDeptQ.data?.data?.data[0]?.planData || [...rows];
 			const repData = getByYearnDeptQ.data?.data?.data[0];
-			console.log('🚀 ~ useMemo ~ repData:', repData);
-			// setRows([...planData]);
-			setRowData([...planData]);
+			console.log('🚀 ~ useMemo ~ plaData:  at creTable', repData);
+			setRows([...planData]);
+			// setrows([...planData]);
 			if (repData !== null && repData !== undefined) {
-				setUpdate(true);
+				setUpdate(false);
 			}
-			setReportData({ ...repData });
+			// setReportData({ ...repData });
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [getByYearnDeptQ.status, getByYearnDeptQ.data]);
@@ -129,6 +132,7 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 			toast.success('Update ' + response.status);
 			queryClient.invalidateQueries({ queryKey: ['report'] });
 			setUpdate(false);
+			onCancel();
 			getByYearnDeptQ.refetch();
 		},
 		onError: (error) => {
@@ -145,7 +149,7 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 			year: year,
 			department: user.r_data,
 			plan_document: null,
-			planData: [...rowData],
+			planData: [...rows],
 			status: 'submitted',
 			report_id: reportData._id,
 		};
@@ -169,7 +173,7 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 		},
 	});
 	const handleReportSubmit = (values) => {
-		if (rowData.length === 0) {
+		if (rows.length === 0) {
 			toast.error('Please insert Report data before submission');
 			return;
 		}
@@ -177,7 +181,7 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 			year: year,
 			department: user.r_data,
 			plan_document: null,
-			planData: [...rowData],
+			planData: [...rows],
 			status: 'submitted',
 		};
 
@@ -185,9 +189,9 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 	};
 
 	const handleLocalSave = () => {
-		localStorage.setItem(`report ${year}`, JSON.stringify(rowData));
+		localStorage.setItem(`report ${year}`, JSON.stringify(rows));
 		toast.success('Report Saved Successfully!');
-		console.log('report', rowData);
+		console.log('report', rows);
 	};
 
 	const topColumns = [
@@ -616,7 +620,7 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 								))}
 							</StyledTableRow>
 						</TableHead>
-						<TableBody>{renderTableRows(rowData)}</TableBody>
+						<TableBody>{renderTableRows(rows)}</TableBody>
 					</Table>
 				</TableContainer>
 			</Grid2>

@@ -5,7 +5,7 @@ import { tokens } from '../../theme';
 import CreateReportTable from '../tables/CreateReportTable';
 import CloseIcon from '@mui/icons-material/Close';
 
-function ReportModal({ open, onConfirm, onCancel, title, rows, setRows, year }) {
+function ReportModal({ open, onConfirm, onCancel, title, rows, setRows, year, reportData }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	return (
@@ -36,7 +36,13 @@ function ReportModal({ open, onConfirm, onCancel, title, rows, setRows, year }) 
 				{title}
 			</DialogTitle>
 			<DialogContent>
-				<CreateReportTable rows={rows} onCancel={onCancel} setRows={setRows} year={year} />
+				<CreateReportTable
+					reportData={reportData}
+					rows={rows}
+					onCancel={onCancel}
+					setRows={setRows}
+					year={year}
+				/>
 			</DialogContent>
 		</Dialog>
 	);

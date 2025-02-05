@@ -61,57 +61,6 @@ function ViewReportTable({ columns, topColumns, rows }) {
 		},
 	}));
 
-	// const renderTableRows = (data) => {
-	// 	const rows = [];
-
-	// 	const renderRow = (item, level = 0) => {
-	// 		const isKPI = item.KPI_title !== undefined;
-
-	// 		let className = '';
-	// 		if (item.KPI_title) {
-	// 			className = 'kpi';
-	// 		} else if (item.detail_func_title) {
-	// 			className = 'detail';
-	// 		} else if (item.main_func_title) {
-	// 			className = 'main';
-	// 		} else if (item.main_goal) {
-	// 			className = 'goal';
-	// 		}
-
-	// 		rows.push(
-	// 			<StyledTableRow key={item.number} className={className}>
-	// 				<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>{item.number}</FirstColTableCell>
-	// 				<TableBodyCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
-	// 					{item.main_goal || item.main_func_title || item.detail_func_title || item.KPI_title}
-	// 				</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.weight : item.weight || ''}</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.measurement : ''}</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.past_year : ''}</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.present_goal : ''}</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.quarter_goal : ''}</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.quarter_implementation : ''}</TableBodyCell>
-	// 				<TableBodyCell>
-	// 					{isKPI ? (item.quarter_implementation / item.quarter_goal) * 100 + '%' : ''}
-	// 				</TableBodyCell>
-	// 				<TableBodyCell>{isKPI ? item.department : ''}</TableBodyCell>
-	// 			</StyledTableRow>
-	// 		);
-
-	// 		if (item.main_functions) {
-	// 			item.main_functions.forEach((func) => renderRow(func, level + 1));
-	// 		}
-	// 		if (item.detail_functions) {
-	// 			item.detail_functions.forEach((detailFunc) => renderRow(detailFunc, level + 2));
-	// 		}
-	// 		if (item.KPIs) {
-	// 			item.KPIs.forEach((kpi) => renderRow(kpi, level + 3));
-	// 		}
-	// 	};
-
-	// 	data.forEach((item) => renderRow(item));
-	// 	return rows;
-	// };
-
 	const renderTableRows = (rows) => {
 		const tableRows = [];
 		const date = Date();

@@ -24,7 +24,7 @@ const useReportApi = () => {
 		return axios.get('/reports/', { withCredentials: true }).then((res) => res.data);
 	};
 
-	const getBy = ({ queryKey }) => {
+	const getRBy = ({ queryKey }) => {
 		const [, year, department, status] = queryKey;
 		console.log('🚀 ~ getBy ~ department:', department);
 
@@ -43,7 +43,7 @@ const useReportApi = () => {
 		return axios.get(`/reports/?${query}`, { withCredentials: true }).then((res) => res.data);
 	};
 
-	return { getReport, updateReport, getAllReports, getBy, addReport };
+	return { getReport, updateReport, getAllReports, getRBy, addReport };
 };
 
 export default useReportApi;

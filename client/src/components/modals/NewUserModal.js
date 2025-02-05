@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { tokens } from '../../theme';
-import CreateReportTable from '../tables/CreateReportTable';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFormik } from 'formik';
 import { userAddSchema } from '../../utils/yupSchemas';

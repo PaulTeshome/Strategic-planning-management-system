@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import usePlanApi from '../../api/plan';
 import MyContext from '../../utils/MyContext';
+import useReportApi from '../../api/report';
 
 function OReport() {
 	const theme = useTheme();
@@ -32,11 +33,13 @@ function OReport() {
 		onSubmit: handleSearch,
 	});
 
-	const { getBy } = usePlanApi();
+	const { getRBy } = useReportApi();
+
+	const [reportData, setReportData] = useState({});
 
 	const getPlanQuery = useQuery({
-		queryKey: ['plan', values.year, values.department, null],
-		queryFn: getBy,
+		queryKey: ['report', values.year, values.department, 'approved'],
+		queryFn: getRBy,
 		staleTime: 1000 * 60 * 5,
 		enabled: false,
 		// retry: false,
@@ -57,6 +60,9 @@ function OReport() {
 	useMemo(() => {
 		if (getPlanQuery.status === 'success') {
 			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+			console.log('🚀 ~ useMemo ~ planData: page lvl', planData);
+			const repData = getPlanQuery.data?.data?.data[0];
+			setReportData({ ...repData });
 
 			setRows([...planData]);
 		}
@@ -155,8 +161,17 @@ function OReport() {
 				</Grid2>
 			))}
 
+			{rows.length === 0 && getPlanQuery.isFetched && (
+				<Grid2 size={{ xs: 12 }} display="flex" flexDirection="column" gap={1} maxHeight="fit-content">
+					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
+						No approved reports found
+					</Typography>
+				</Grid2>
+			)}
+
 			<ReportModal
 				rows={rows}
+				reportData={reportData}
 				title={`Report for ${values.year}`}
 				open={openReport}
 				onCancel={() => setOpenReport(false)}

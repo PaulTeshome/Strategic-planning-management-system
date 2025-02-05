@@ -25,7 +25,7 @@ function SPReport() {
 	const date = new Date();
 
 	const { report_id } = useParams();
-	const { getReport, getBy, updateReport } = useReportApi();
+	const { getReport, getRBy, updateReport } = useReportApi();
 
 	const [selectedPlan, setSelectedPlan] = useState({ _id: report_id });
 
@@ -75,7 +75,7 @@ function SPReport() {
 	const getByYearnDeptQ = useQuery({
 		queryKey: ['report', values.year, values.department, 'submitted'],
 		enabled: false,
-		queryFn: getBy,
+		queryFn: getRBy,
 		staleTime: 1000 * 60 * 5,
 		retry: false,
 	});
@@ -215,7 +215,7 @@ function SPReport() {
 						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
 						size="medium"
 					>
-						Approve Report
+						Request Report Approval
 					</Button>
 					<ConfirmationModal
 						open={confirmOpen}
@@ -231,19 +231,6 @@ function SPReport() {
 			</Grid2>
 
 			<ViewReportTable
-				// columns={[
-				// 	{ name: 'Number', colSpan: 1 },
-				// 	{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
-				// 	{ name: 'Weights', colSpan: 1 },
-				// 	{ name: 'Measurements', colSpan: 1 },
-				// 	{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
-				// 	{ name: `This year(${values.year}) Goal`, colSpan: 1 },
-				// 	{ name: 'Quarter 1 and 2 goal', colSpan: 1 },
-				// 	{ name: 'Quarter 1 and 2 implementation', colSpan: 1 },
-				// 	{ name: 'Quarter 1 and 2 completeness by percentage', colSpan: 1 },
-				// 	{ name: 'Department', colSpan: 1 },
-				// ]}
-
 				topColumns={[
 					{ name: '', colSpan: 10 },
 					{ name: 'Quarter 1', colSpan: 2 },
