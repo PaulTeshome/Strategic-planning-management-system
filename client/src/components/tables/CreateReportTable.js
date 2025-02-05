@@ -41,7 +41,8 @@ function CreateReportTable({ rows, onCancel, setRows, year }) {
 	const [rowData, setRowData] = useState([]);
 
 	const getByYearnDeptQ = useQuery({
-		queryKey: ['report', year, user.r_data, 'submitted'],
+		// queryKey: ['report', year, user.r_data, 'submitted'],
+		queryKey: ['report', year, user.r_data, 'approved'],
 		queryFn: getBy,
 		staleTime: 1000 * 60 * 5,
 		retry: false,
