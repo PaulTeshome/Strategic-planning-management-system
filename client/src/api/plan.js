@@ -7,6 +7,7 @@ const usePlanApi = () => {
 
 	const updatePlan = (data) => {
 		const { plan_id, ...rest } = data;
+
 		return axios.patch(`/strategicPlan/${plan_id}`, { ...rest }, { withCredentials: true }).then((res) => res.data);
 	};
 

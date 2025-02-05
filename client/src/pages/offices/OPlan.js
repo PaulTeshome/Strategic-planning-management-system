@@ -57,9 +57,46 @@ function OPlan() {
 	const { getPlan, addStrategicPlan, updatePlan } = usePlanApi();
 	const { getAllFeedbacks } = useFeedbackApi();
 
+	const getPlanQuery = useQuery({
+		queryKey: ['plan', plan_id, 'pending'],
+		enabled: plan_id !== undefined && plan_id !== null,
+		queryFn: getPlan,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.custom(
+				<InfoToast
+					message={
+						getPlanQuery.error?.response?.data?.message ||
+						getPlanQuery.error.message ||
+						'Error getting plan'
+					}
+				/>,
+				{
+					id: 'getPlan',
+				}
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
+			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+			// if (planData.length > 0) {
+			setUpdate(true);
+			// }
+			setRows([...planData]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
+
 	const getFeedbackQuery = useQuery({
 		queryKey: ['feedback', plan_id],
-		enabled: plan_id !== undefined && plan_id !== null,
+		enabled: getPlanQuery.status === 'success',
 		queryFn: getAllFeedbacks,
 		staleTime: 1000 * 60 * 5,
 		// retry: false,
@@ -93,43 +130,6 @@ function OPlan() {
 		}
 	}, [getFeedbackQuery.status, getFeedbackQuery.data]);
 
-	const getPlanQuery = useQuery({
-		queryKey: ['plan', plan_id, 'pending'],
-		enabled: plan_id !== undefined && plan_id !== null,
-		queryFn: getPlan,
-		staleTime: 1000 * 60 * 5,
-		// retry: false,
-	});
-
-	useEffect(() => {
-		if (getPlanQuery.status === 'error') {
-			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
-			toast.custom(
-				<InfoToast
-					message={
-						getPlanQuery.error?.response?.data?.message ||
-						getPlanQuery.error.message ||
-						'Error getting plan'
-					}
-				/>,
-				{
-					id: 'getPlan',
-				}
-			);
-		}
-	}, [getPlanQuery.status, getPlanQuery.error]);
-
-	useMemo(() => {
-		if (getPlanQuery.status === 'success') {
-			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
-			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
-			if (planData.length > 0) {
-				setUpdate(true);
-			}
-			setRows([...planData]);
-		}
-	}, [getPlanQuery.status, getPlanQuery.data]);
-
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [confirmUpdate, setConfirmUpdate] = useState(false);
 
@@ -162,6 +162,8 @@ function OPlan() {
 			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
 			toast.success('Update ' + response.status);
 			queryClient.invalidateQueries({ queryKey: ['plans'] });
+			setUpdate(false);
+			getPlanQuery.refetch();
 		},
 		onError: (error) => {
 			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
@@ -171,22 +173,26 @@ function OPlan() {
 	});
 
 	const handlePlanUpdate = () => {
-		const { year, department, plan_document, planData } = planFormik.values;
+		const { year, department, plan_document } = planFormik.values;
+		console.log('🚀 ~ handlePlanUpdate ~ planFormik.values:', planFormik.values);
 		const data = {
 			year: year,
 			department: department,
 			plan_document: plan_document,
-			planData: planData,
+			planData: [...rows],
 			status: 'submitted',
 			plan_id: plan_id,
 		};
-		console.log('🚀 ~ handlePlanUpdate ~ data:', data);
 
 		updatePlanMut.mutate(data);
 	};
 
 	const handlePlanSubmit = (values) => {
 		const { year, department, plan_document, planData, status } = values;
+		if (planData.length === 0) {
+			toast.error('Please insert plan data before submission');
+			return;
+		}
 		const data = {
 			year: year,
 			department: department,
@@ -366,8 +372,9 @@ function OPlan() {
 						</Typography>
 					</Grid2>
 				)}
-				{feedbacks.map((feedback) => (
+				{feedbacks.map((feedback, index) => (
 					<Grid2
+						key={index + feedback.user_id}
 						size={{ xs: 3.8 }}
 						border={1.5}
 						borderRadius={1}
