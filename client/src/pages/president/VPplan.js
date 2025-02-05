@@ -20,6 +20,7 @@ function VPplan() {
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [rows, setRows] = useState([]);
+	const date = new Date();
 
 	const { plan_id } = useParams();
 	const { getPlan, getBy } = usePlanApi();
@@ -55,8 +56,6 @@ function VPplan() {
 	const handleApprove = () => {
 		console.log('🚀 ~ handleApprove ~ first:', values);
 	};
-
-	const date = new Date();
 
 	const handleSearch = (values) => {
 		// const { year, department } = values;
