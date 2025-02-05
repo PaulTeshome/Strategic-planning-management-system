@@ -1,21 +1,59 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
-import { useFormik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
-import { vpPlanSchema } from '../../utils/yupSchemas';
+import { feedbackValidationSchema, vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
 import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { useParams } from 'react-router-dom';
+import usePlanApi from '../../api/plan';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import MyContext from '../../utils/MyContext';
+import useFeedbackApi from '../../api/feedback';
 
 function SPplan() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [rows, setRows] = useState([]);
+	const date = new Date();
+
+	const { plan_id } = useParams();
+	const { getPlan, getBy } = usePlanApi();
+
+	const [selectedPlan, setSelectedPlan] = useState({ _id: plan_id });
+
+	const getPlanQuery = useQuery({
+		queryKey: ['plan', plan_id, 'submitted'],
+		enabled: plan_id !== undefined && plan_id !== null,
+		queryFn: getPlan,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.error(
+				getPlanQuery.error?.response?.data?.message || getPlanQuery.error.message || 'Error getting plans'
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
+			const patientList = getPlanQuery.data?.data?.data[0]?.planData || [];
+			setRows([...patientList]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
@@ -23,9 +61,11 @@ function SPplan() {
 	const handleApprove = () => {
 		console.log('🚀 ~ handleApprove ~ first:', values);
 	};
-	const handleSearch = () => {};
 
-	const date = new Date();
+	const handleSearch = (values) => {
+		// const { year, department } = values;
+		getByYearnDeptQ.refetch();
+	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
@@ -35,6 +75,65 @@ function SPplan() {
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	const getByYearnDeptQ = useQuery({
+		queryKey: ['plan', values.year, values.department, 'submitted'],
+		enabled: false,
+		queryFn: getBy,
+		staleTime: 1000 * 60 * 5,
+		retry: false,
+	});
+
+	useEffect(() => {
+		if (getByYearnDeptQ.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getByYearnDeptQ.error:', getByYearnDeptQ.error);
+			toast.error(
+				getByYearnDeptQ.error?.response?.data?.message || getByYearnDeptQ.error.message || 'Error getting plans'
+			);
+		}
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.error]);
+
+	useMemo(() => {
+		if (getByYearnDeptQ.status === 'success') {
+			// console.log('🚀 ~ useMemo ~ getPlan', getByYearnDeptQ.data);
+			const planData = getByYearnDeptQ.data?.data?.data[0]?.planData || [];
+			const planInfo = getByYearnDeptQ.data?.data?.data[0];
+			console.log('🚀 ~ useMemo ~ planInfo:', planInfo);
+			setSelectedPlan({ ...planInfo });
+			setRows([...planData]);
+		}
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.data]);
+
+	const { user } = useContext(MyContext);
+	const { addFeedback } = useFeedbackApi();
+	const queryClient = useQueryClient();
+
+	const addFeedMut = useMutation({
+		mutationFn: addFeedback,
+		mutationKey: ['addFeedback'],
+		onSuccess: (response) => {
+			// console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success(response.status);
+			queryClient.invalidateQueries({ queryKey: ['plan'] });
+		},
+		onError: (error) => {
+			// console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handleFeedbackSubmit = (values) => {
+		// console.log('🚀 ~ handleFeedbackSubmit ~ values:', values);
+		const data = {
+			plan_id: selectedPlan._id,
+			user_id: user.user_id,
+			message: values.message,
+		};
+		console.log('🚀 ~ handleFeedbackSubmit ~ data:', data);
+
+		addFeedMut.mutate(data);
+	};
 
 	return (
 		<Stack
@@ -107,12 +206,12 @@ function SPplan() {
 						Search Plan
 					</Button>
 				</Grid2>
-				<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
+				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
 						Plan for {values.year}
 					</Typography>
 				</Grid2>
-				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
+				<Grid2 size={{ xs: 12 }} display="flex" pl="80%" maxHeight="fit-content">
 					<Button
 						fullWidth
 						onClick={() => {
@@ -123,7 +222,7 @@ function SPplan() {
 						sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
 						size="medium"
 					>
-						Approve Plan
+						Request Plan Approval
 					</Button>
 					<ConfirmationModal
 						open={confirmOpen}
@@ -137,6 +236,48 @@ function SPplan() {
 					/>
 				</Grid2>
 			</Grid2>
+			{rows.length > 0 && (
+				<Grid2 container display="flex" justifyContent="flex-start" alignItems="center" width="100%" gap={1}>
+					<Formik
+						onSubmit={handleFeedbackSubmit}
+						initialValues={{
+							message: '',
+						}}
+						validationSchema={feedbackValidationSchema}
+					>
+						{({ values, errors, touched, handleBlur, handleChange, submitForm, setFieldValue }) => (
+							<>
+								<Grid2 size={{ xs: 9 }}>
+									<TextField
+										fullWidth
+										variant="outlined"
+										multiline
+										rows={4}
+										type="text"
+										label="message"
+										onBlur={handleBlur}
+										onChange={handleChange}
+										value={values.message}
+										name="message"
+										error={touched.message && Boolean(errors.message)}
+										helperText={touched.message && errors.message}
+									/>
+								</Grid2>
+								<Grid2 size={{ xs: 12 }}>
+									<Button
+										onClick={() => {
+											submitForm();
+										}}
+										variant="outlined"
+									>
+										Send Feedback
+									</Button>
+								</Grid2>
+							</>
+						)}
+					</Formik>
+				</Grid2>
+			)}
 
 			<ViewPlanTable
 				columns={[
@@ -152,7 +293,7 @@ function SPplan() {
 					{ name: 'Quarter 4', colSpan: 1 },
 					{ name: 'Department', colSpan: 1 },
 				]}
-				rows={mockPlan}
+				rows={rows}
 			/>
 		</Stack>
 	);

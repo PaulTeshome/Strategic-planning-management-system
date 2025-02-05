@@ -18,6 +18,10 @@ export const vpPlanSchema = yup.object().shape({
 	department: yup.string().required('Department is required'),
 });
 
+export const feedbackValidationSchema = yup.object().shape({
+	message: yup.string().required('Message is required'),
+});
+
 export const vpReportSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
 	department: yup.string().required('Department is required'),
