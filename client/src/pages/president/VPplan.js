@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
 import { vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
-import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
@@ -58,10 +57,9 @@ function VPplan() {
 	};
 
 	const date = new Date();
-	const [search, setSearch] = useState(false);
 
 	const handleSearch = (values) => {
-		const { year, department } = values;
+		// const { year, department } = values;
 		getByYearnDeptQ.refetch();
 	};
 

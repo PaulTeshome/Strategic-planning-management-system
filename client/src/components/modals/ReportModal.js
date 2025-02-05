@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
 import { tokens } from '../../theme';
 import CreateReportTable from '../tables/CreateReportTable';
@@ -36,7 +36,7 @@ function ReportModal({ open, onConfirm, onCancel, title, rows, setRows, year }) 
 				{title}
 			</DialogTitle>
 			<DialogContent>
-				<CreateReportTable rows={rows} setRows={setRows} year={year} />
+				<CreateReportTable rows={rows} onCancel={onCancel} setRows={setRows} year={year} />
 			</DialogContent>
 		</Dialog>
 	);

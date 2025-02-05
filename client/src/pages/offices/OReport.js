@@ -1,43 +1,66 @@
 import { Button, Grid2, Stack, TextField, Typography, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import SelectComponent from '../../components/form/SelectComponent';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import { tokens } from '../../theme';
 import { vpPlanSchema } from '../../utils/yupSchemas';
 import { useFormik } from 'formik';
-import CreateReportTable from '../../components/tables/CreateReportTable';
 import ReportModal from '../../components/modals/ReportModal';
+import { useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import usePlanApi from '../../api/plan';
+import MyContext from '../../utils/MyContext';
 
 function OReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
-
-	const [confirmOpen, setConfirmOpen] = useState(false);
-
-	const closeConfirm = () => {
-		setConfirmOpen(false);
-	};
-	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', values);
-	};
-	const handleSearch = () => {};
-
 	const date = new Date();
+	const { user } = useContext(MyContext);
+	const [rows, setRows] = useState([]);
 
-	const [rows, setRows] = useState(() => {
-		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
-		return storedPlan ? JSON.parse(storedPlan) : [];
-	});
+	const handleSearch = () => {
+		getPlanQuery.refetch();
+	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
-			department: '',
+			department: user.r_data,
 			reportData: rows,
 		},
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
 	});
+
+	const { getBy } = usePlanApi();
+
+	const getPlanQuery = useQuery({
+		queryKey: ['plan', values.year, values.department, null],
+		queryFn: getBy,
+		staleTime: 1000 * 60 * 5,
+		enabled: false,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.error(
+				getPlanQuery.error?.response?.data?.message || getPlanQuery.error.message || 'Error getting plan',
+				{
+					id: 'getPlan',
+				}
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+
+			setRows([...planData]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
 
 	const [openReport, setOpenReport] = useState(false);
 
@@ -95,6 +118,7 @@ function OReport() {
 						error={errors.department}
 						label="Department*"
 						name="department"
+						disabled={true}
 						value={values.department}
 						onChange={handleChange}
 						onBlur={handleBlur}
@@ -108,20 +132,29 @@ function OReport() {
 					/>
 				</Grid2>
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
-					<Button type="submit" fullWidth variant="contained" size="large">
+					<Button type="submit" disabled={getPlanQuery.isLoading} fullWidth variant="contained" size="large">
 						Search Plan
 					</Button>
 				</Grid2>
-
-				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
+			</Grid2>
+			{rows.map((plan, index) => (
+				<Grid2
+					key={index}
+					size={{ xs: 12 }}
+					display="flex"
+					flexDirection="column"
+					gap={1}
+					maxHeight="fit-content"
+				>
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
 						Report for {values.year}
 					</Typography>
+					<Button onClick={() => setOpenReport(true)} variant="outlined">
+						Open Report for {values.year}
+					</Button>
 				</Grid2>
-			</Grid2>
-			<Button onClick={() => setOpenReport(true)} variant="text">
-				Open Report
-			</Button>
+			))}
+
 			<ReportModal
 				rows={rows}
 				title={`Report for ${values.year}`}

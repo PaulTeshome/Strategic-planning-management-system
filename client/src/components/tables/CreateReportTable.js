@@ -15,20 +15,62 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
-import { Add, Delete, Save } from '@mui/icons-material';
+import { Add, Delete, Save, Upload } from '@mui/icons-material';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import MyContext from '../../utils/MyContext';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 import SelectComponent from '../form/SelectComponent';
 import toast from 'react-hot-toast';
+import useReportApi from '../../api/report';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import ConfirmationModal from '../modals/ConfirmationModal';
 
-function CreateReportTable({ rows, setRows, year }) {
+function CreateReportTable({ rows, onCancel, setRows, year }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const { user } = useContext(MyContext);
+
+	const { getBy, addReport, updateReport } = useReportApi();
+	const queryClient = useQueryClient();
+	const [update, setUpdate] = useState(false);
+
+	const [reportData, setReportData] = useState({});
+	const [rowData, setRowData] = useState([]);
+
+	const getByYearnDeptQ = useQuery({
+		queryKey: ['report', year, user.r_data, 'submitted'],
+		queryFn: getBy,
+		staleTime: 1000 * 60 * 5,
+		retry: false,
+	});
+
+	useEffect(() => {
+		if (getByYearnDeptQ.status === 'error') {
+			// // // console.log('🚀 ~ Patients ~ getByYearnDeptQ.error:', getByYearnDeptQ.error);
+			toast.error(
+				getByYearnDeptQ.error?.response?.data?.message || getByYearnDeptQ.error.message || 'Error getting plans'
+			);
+		}
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.error]);
+
+	useMemo(() => {
+		if (getByYearnDeptQ.status === 'success') {
+			// // console.log('🚀 ~ useMemo ~ getReport', getByYearnDeptQ.data);
+			const planData = getByYearnDeptQ.data?.data?.data[0]?.planData || [...rows];
+			const repData = getByYearnDeptQ.data?.data?.data[0];
+			console.log('🚀 ~ useMemo ~ repData:', repData);
+			// setRows([...planData]);
+			setRowData([...planData]);
+			if (repData !== null && repData !== undefined) {
+				setUpdate(true);
+			}
+			setReportData({ ...repData });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [getByYearnDeptQ.status, getByYearnDeptQ.data]);
 
 	const date = new Date();
 	const presentYear = date.getFullYear();
@@ -78,10 +120,73 @@ function CreateReportTable({ rows, setRows, year }) {
 		},
 	}));
 
+	const updatePlanMut = useMutation({
+		mutationFn: updateReport,
+		mutationKey: ['updateReport'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success('Update ' + response.status);
+			queryClient.invalidateQueries({ queryKey: ['report'] });
+			setUpdate(false);
+			getByYearnDeptQ.refetch();
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handlePlanUpdate = () => {
+		console.log('🚀 ~ handlePlanUpdate ~ reportData;:', reportData);
+
+		const data = {
+			year: year,
+			department: user.r_data,
+			plan_document: null,
+			planData: [...rowData],
+			status: 'submitted',
+			report_id: reportData._id,
+		};
+
+		updatePlanMut.mutate(data);
+	};
+
+	const addReportMut = useMutation({
+		mutationFn: addReport,
+		mutationKey: ['addReport'],
+		onSuccess: (response) => {
+			// // // // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success(response.status);
+			queryClient.invalidateQueries({ queryKey: ['reports'] });
+			onCancel();
+		},
+		onError: (error) => {
+			// // // // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+	const handleReportSubmit = (values) => {
+		if (rowData.length === 0) {
+			toast.error('Please insert Report data before submission');
+			return;
+		}
+		const data = {
+			year: year,
+			department: user.r_data,
+			plan_document: null,
+			planData: [...rowData],
+			status: 'submitted',
+		};
+
+		addReportMut.mutate(data);
+	};
+
 	const handleLocalSave = () => {
-		localStorage.setItem(`report ${year}`, JSON.stringify(rows));
+		localStorage.setItem(`report ${year}`, JSON.stringify(rowData));
 		toast.success('Report Saved Successfully!');
-		console.log('report', rows);
+		console.log('report', rowData);
 	};
 
 	const topColumns = [
@@ -142,6 +247,7 @@ function CreateReportTable({ rows, setRows, year }) {
 
 	const renderTableRows = (rows) => {
 		const tableRows = [];
+		const date = Date();
 
 		const renderRow = (item, level = 0) => {
 			const isKPI = item.KPI_title !== undefined;
@@ -160,6 +266,8 @@ function CreateReportTable({ rows, setRows, year }) {
 			// let department_name = '';
 
 			if (item.KPI_title !== undefined) {
+				// // // console.log('🚀 ~ renderRow ~ item:', item);
+
 				className = 'kpi';
 				textLabel = 'KPI';
 				textName = 'KPI_title';
@@ -188,19 +296,31 @@ function CreateReportTable({ rows, setRows, year }) {
 			const TitleFieldName = textName + '_' + item.number.replace(/\./g, '_');
 
 			const handleRowSubmit = (value) => {
-				// console.log('🚀 ~ handleRowSubmit ~ value:', value);
-				// console.log('🚀 ~ handleRowSubmit ~ value:', rows);
+				// // // console.log('🚀 ~ handleRowSubmit ~ value:', value);
+				// // // console.log('🚀 ~ handleRowSubmit ~ value:', rows);
 			};
+
+			const Q1_pastDue = new Date(reportData.quarter_1_due_date).getTime() < Date.now();
+			// // console.log('🚀 ~ renderRow ~ Q1_pastDue:', Q1_pastDue);
+			const Q2_pastDue = new Date(reportData.quarter_2_due_date).getTime() < Date.now();
+			// // console.log('🚀 ~ renderRow ~ Q2_pastDue:', Q2_pastDue);
+			const Q3_pastDue = new Date(reportData.quarter_3_due_date).getTime() < Date.now();
+			const Q4_pastDue = new Date(reportData.quarter_4_due_date).getTime() < Date.now();
+
+			const Q2_hasDue = reportData.quarter_2_due_date !== undefined && reportData.quarter_2_due_date !== null;
+			// // console.log('🚀 ~ renderRow ~ Q2_hasDue:', Q2_hasDue);
+			const Q3_hasDue = reportData.quarter_3_due_date !== undefined && reportData.quarter_3_due_date !== null;
+			const Q4_hasDue = reportData.quarter_4_due_date !== undefined && reportData.quarter_4_due_date !== null;
 
 			const KPIinitials = isKPI
 				? {
 						[measurement_name]: item.measurement,
 						[past_year_name]: item.past_year,
 						[present_goal_name]: item.present_goal,
-						[quarter_1_name]: item.quarter_1,
-						[quarter_2_name]: item.quarter_2,
-						[quarter_3_name]: item.quarter_3,
-						[quarter_4_name]: item.quarter_4,
+						[quarter_1_name]: item?.quarter_1_progress || 0,
+						[quarter_2_name]: item?.quarter_2_progress || 0,
+						[quarter_3_name]: item?.quarter_3_progress || 0,
+						[quarter_4_name]: item?.quarter_4_progress || 0,
 					}
 				: {};
 
@@ -216,20 +336,11 @@ function CreateReportTable({ rows, setRows, year }) {
 					}
 				: {};
 
-			const progressSum =
-				parseFloat(item.quarter_1_progress) +
-				parseFloat(item.quarter_2_progress) +
-				parseFloat(item.quarter_3_progress) +
-				parseFloat(item.quarter_4_progress);
-
-			console.log('🚀 ~ renderRow ~ progressSum:', progressSum);
-
 			const goalSum =
 				parseFloat(item.quarter_1) +
 				parseFloat(item.quarter_2) +
 				parseFloat(item.quarter_3) +
 				parseFloat(item.quarter_4);
-			console.log('🚀 ~ renderRow ~ progressSum:', progressSum);
 
 			tableRows.push(
 				<Formik
@@ -242,113 +353,146 @@ function CreateReportTable({ rows, setRows, year }) {
 						...KPIValidations,
 					})}
 				>
-					{({ values, errors, touched, handleBlur, handleChange, submitForm, setFieldValue }) => (
-						<StyledTableRow key={TitleFieldName} className={className}>
-							<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
-								{item.number}
-							</FirstColTableCell>
-							<TableBodyCell colSpan={!isKPI ? 19 : 6} style={{ paddingLeft: `${level * 2 + 10}px` }}>
-								{item[textName]}
-								{` (Weight = ${item.weight})`}
-							</TableBodyCell>
+					{({ values, errors, touched, handleBlur, handleChange, submitForm, setFieldValue }) => {
+						const performancePercentage =
+							((parseFloat(values[quarter_1_name]) +
+								parseFloat(values[quarter_2_name]) +
+								parseFloat(values[quarter_3_name]) +
+								parseFloat(values[quarter_4_name])) /
+								goalSum) *
+							100;
+						const performColor =
+							performancePercentage > 70
+								? 'green'
+								: performancePercentage > 50
+									? colors.aastuGold[600]
+									: 'red';
+						return (
+							<StyledTableRow key={TitleFieldName} className={className}>
+								<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
+									{item.number}
+								</FirstColTableCell>
+								<TableBodyCell colSpan={!isKPI ? 19 : 6} style={{ paddingLeft: `${level * 2 + 10}px` }}>
+									{item[textName]}
+									{` (Weight = ${item.weight})`}
+								</TableBodyCell>
 
-							{isKPI && (
-								<>
-									<TableBodyCell>{item.measurement}</TableBodyCell>
-									<TableBodyCell>{item.past_year}</TableBodyCell>
-									<TableBodyCell>{item.present_goal}</TableBodyCell>
-									<TableBodyCell>{item.quarter_1}</TableBodyCell>
-									<TableBodyCell>
-										<TextField
-											slotProps={{
-												inputLabel: { shrink: true },
-											}}
-											fullWidth
-											size="small"
-											type="number"
-											label="Quarter 1"
-											name={quarter_1_name}
-											onBlur={handleBlur}
-											onChange={(event) => {
-												item.quarter_1_progress = event.target.value;
-												setFieldValue(quarter_1_name, event.target.value);
-											}}
-											value={values[quarter_1_name]}
-											error={touched[quarter_1_name] && Boolean(errors[quarter_1_name])}
-											helperText={touched[quarter_1_name] && errors[quarter_1_name]}
-										/>
-									</TableBodyCell>
-									<TableBodyCell>{item.quarter_2}</TableBodyCell>
-									<TableBodyCell>
-										<TextField
-											slotProps={{
-												inputLabel: { shrink: true },
-											}}
-											fullWidth
-											size="small"
-											type="number"
-											label="Quarter 2"
-											name={quarter_2_name}
-											onBlur={handleBlur}
-											onChange={(event) => {
-												item.quarter_2_progress = event.target.value;
-												setFieldValue(quarter_2_name, event.target.value);
-											}}
-											value={values[quarter_2_name]}
-											error={touched[quarter_2_name] && Boolean(errors[quarter_2_name])}
-											helperText={touched[quarter_2_name] && errors[quarter_2_name]}
-										/>
-									</TableBodyCell>
-									<TableBodyCell>{item.quarter_3}</TableBodyCell>
-									<TableBodyCell>
-										{' '}
-										<TextField
-											slotProps={{
-												inputLabel: { shrink: true },
-											}}
-											fullWidth
-											size="small"
-											type="number"
-											label="Quarter 3"
-											name={quarter_3_name}
-											onBlur={handleBlur}
-											onChange={(event) => {
-												item.quarter_3_progress = event.target.value;
-												setFieldValue(quarter_3_name, event.target.value);
-											}}
-											value={values[quarter_3_name]}
-											error={touched[quarter_3_name] && Boolean(errors[quarter_3_name])}
-											helperText={touched[quarter_3_name] && errors[quarter_3_name]}
-										/>
-									</TableBodyCell>
-									<TableBodyCell>{item.quarter_4}</TableBodyCell>
-									<TableBodyCell>
-										{' '}
-										<TextField
-											slotProps={{
-												inputLabel: { shrink: true },
-											}}
-											fullWidth
-											size="small"
-											type="number"
-											label="Quarter 4"
-											name={quarter_4_name}
-											onBlur={handleBlur}
-											onChange={(event) => {
-												item.quarter_4_progress = event.target.value;
-												setFieldValue(quarter_4_name, event.target.value);
-											}}
-											value={values[quarter_4_name]}
-											error={touched[quarter_4_name] && Boolean(errors[quarter_4_name])}
-											helperText={touched[quarter_4_name] && errors[quarter_4_name]}
-										/>
-									</TableBodyCell>
-									<TableBodyCell colSpan={0.5}>{(progressSum / goalSum) * 100}%</TableBodyCell>
-									<TableBodyCell>{getDepartmentByRole(item.department)}</TableBodyCell>
-								</>
-							)}
-						</StyledTableRow>
-					)}
+								{isKPI && (
+									<>
+										<TableBodyCell>{item.measurement}</TableBodyCell>
+										<TableBodyCell>{item.past_year}</TableBodyCell>
+										<TableBodyCell>{item.present_goal}</TableBodyCell>
+										<TableBodyCell>{item.quarter_1}</TableBodyCell>
+										<TableBodyCell>
+											{Q1_pastDue ? (
+												<Typography>{values[quarter_1_name]}</Typography>
+											) : (
+												<TextField
+													slotProps={{
+														inputLabel: { shrink: true },
+													}}
+													fullWidth
+													size="small"
+													type="number"
+													label="Quarter 1"
+													name={quarter_1_name}
+													onBlur={handleBlur}
+													onChange={(event) => {
+														item.quarter_1_progress = event.target.value;
+														setFieldValue(quarter_1_name, event.target.value);
+													}}
+													value={values[quarter_1_name]}
+													error={touched[quarter_1_name] && Boolean(errors[quarter_1_name])}
+													helperText={touched[quarter_1_name] && errors[quarter_1_name]}
+												/>
+											)}
+										</TableBodyCell>
+										<TableBodyCell>{item.quarter_2}</TableBodyCell>
+										<TableBodyCell>
+											{Q2_pastDue || !Q2_hasDue ? (
+												<Typography>{values[quarter_2_name]}</Typography>
+											) : (
+												<TextField
+													slotProps={{
+														inputLabel: { shrink: true },
+													}}
+													fullWidth
+													size="small"
+													type="number"
+													label="Quarter 2"
+													name={quarter_2_name}
+													onBlur={handleBlur}
+													onChange={(event) => {
+														item.quarter_2_progress = event.target.value;
+														setFieldValue(quarter_2_name, event.target.value);
+													}}
+													value={values[quarter_2_name]}
+													error={touched[quarter_2_name] && Boolean(errors[quarter_2_name])}
+													helperText={touched[quarter_2_name] && errors[quarter_2_name]}
+												/>
+											)}
+										</TableBodyCell>
+										<TableBodyCell>{item.quarter_3}</TableBodyCell>
+										<TableBodyCell>
+											{Q3_pastDue || !Q3_hasDue ? (
+												<Typography>{values[quarter_3_name]}</Typography>
+											) : (
+												<TextField
+													slotProps={{
+														inputLabel: { shrink: true },
+													}}
+													fullWidth
+													size="small"
+													type="number"
+													label="Quarter 3"
+													name={quarter_3_name}
+													onBlur={handleBlur}
+													onChange={(event) => {
+														item.quarter_3_progress = event.target.value;
+														setFieldValue(quarter_3_name, event.target.value);
+													}}
+													value={values[quarter_3_name]}
+													error={touched[quarter_3_name] && Boolean(errors[quarter_3_name])}
+													helperText={touched[quarter_3_name] && errors[quarter_3_name]}
+												/>
+											)}
+										</TableBodyCell>
+										<TableBodyCell>{item.quarter_4}</TableBodyCell>
+										<TableBodyCell>
+											{Q4_pastDue || !Q4_hasDue ? (
+												<Typography>{values[quarter_4_name]}</Typography>
+											) : (
+												<TextField
+													slotProps={{
+														inputLabel: { shrink: true },
+													}}
+													fullWidth
+													size="small"
+													type="number"
+													label="Quarter 4"
+													name={quarter_4_name}
+													onBlur={handleBlur}
+													onChange={(event) => {
+														item.quarter_4_progress = event.target.value;
+														setFieldValue(quarter_4_name, event.target.value);
+													}}
+													value={values[quarter_4_name]}
+													error={touched[quarter_4_name] && Boolean(errors[quarter_4_name])}
+													helperText={touched[quarter_4_name] && errors[quarter_4_name]}
+												/>
+											)}
+										</TableBodyCell>
+										<TableBodyCell colSpan={0.5}>
+											<Typography color={performColor} fontWeight="bold">
+												{performancePercentage}%
+											</Typography>
+										</TableBodyCell>
+										<TableBodyCell>{getDepartmentByRole(item.department)}</TableBodyCell>
+									</>
+								)}
+							</StyledTableRow>
+						);
+					}}
 				</Formik>
 			);
 
@@ -367,6 +511,13 @@ function CreateReportTable({ rows, setRows, year }) {
 		return tableRows;
 	};
 
+	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [confirmUpdate, setConfirmUpdate] = useState(false);
+
+	const closeConfirm = () => {
+		setConfirmOpen(false);
+		setConfirmUpdate(false);
+	};
 	return (
 		<Grid2
 			container
@@ -380,7 +531,8 @@ function CreateReportTable({ rows, setRows, year }) {
 			// autoComplete="off"
 			// noValidate
 		>
-			<Grid2 size={{ xs: 12 }} display="flex" pl={'80%'} alignItems="flex-end" maxHeight="fit-content">
+			<Grid2 size={{ xs: 7.8 }}></Grid2>
+			<Grid2 size={{ xs: 2 }} display="flex" alignItems="flex-end" maxHeight="fit-content">
 				<Button
 					type="submit"
 					fullWidth
@@ -388,11 +540,61 @@ function CreateReportTable({ rows, setRows, year }) {
 					variant="contained"
 					startIcon={<Save sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
 					sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
-					onClick={handleLocalSave}
+					onClick={() => handleLocalSave()}
 					size="medium"
 				>
 					Save Report
 				</Button>
+			</Grid2>
+			<Grid2 size={{ xs: 2 }} display="flex" alignItems="flex-end" maxHeight="fit-content">
+				{update ? (
+					<Button
+						onClick={() => {
+							setConfirmUpdate(true);
+						}}
+						fullWidth
+						variant="contained"
+						size="large"
+					>
+						Update Report
+					</Button>
+				) : (
+					<Button
+						type="submit"
+						fullWidth
+						disabled={isPreviousYear}
+						variant="contained"
+						startIcon={<Upload sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
+						onClick={() => {
+							setConfirmOpen(true);
+						}}
+						size="medium"
+					>
+						Submit Report
+					</Button>
+				)}
+
+				<ConfirmationModal
+					open={confirmUpdate}
+					onCancel={closeConfirm}
+					onConfirm={() => {
+						handlePlanUpdate();
+						setConfirmUpdate(false);
+					}}
+					title="Update report"
+					message="Are you sure you want to update this report?"
+				/>
+
+				<ConfirmationModal
+					open={confirmOpen}
+					onCancel={closeConfirm}
+					onConfirm={() => {
+						handleReportSubmit();
+						setConfirmOpen(false);
+					}}
+					title="Submit Report"
+					message="Are you sure you want to submit this report?"
+				/>
 			</Grid2>
 			<Grid2 size={{ xs: 12 }} sx={{ overflowY: 'auto' }}>
 				<TableContainer component={Paper}>
@@ -413,7 +615,7 @@ function CreateReportTable({ rows, setRows, year }) {
 								))}
 							</StyledTableRow>
 						</TableHead>
-						<TableBody>{renderTableRows(rows)}</TableBody>
+						<TableBody>{renderTableRows(rowData)}</TableBody>
 					</Table>
 				</TableContainer>
 			</Grid2>
