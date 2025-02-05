@@ -1,106 +1,78 @@
 import { useTheme } from '@emotion/react';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { DataGrid } from '@mui/x-data-grid';
 import DataGridWrapper from '../../components/global/DataGridWrapper';
 import CustomToolbar from '../../components/global/CustomToolbar';
 import { Link } from 'react-router-dom';
-
-import { Grid2, TextField } from '@mui/material';
-import { useFormik } from 'formik';
-import SelectComponent from '../../components/form/SelectComponent';
-import { vpPlanSchema } from '../../utils/yupSchemas';
-import { CheckCircle } from '@mui/icons-material';
-import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import usePlanApi from '../../api/plan';
+import { useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { formatDate } from '../../utils/formatDate';
 
 function SPViewPlans() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
-	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [rows, setRows] = useState([]);
 
-	const closeConfirm = () => {
-		setConfirmOpen(false);
-	};
-	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', values);
-	};
-	const handleSearch = () => {};
+	const { getAllPlans } = usePlanApi();
 
-	const date = new Date();
-
-	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
-		initialValues: {
-			year: date.getFullYear(),
-			department: '',
-		},
-		validationSchema: vpPlanSchema,
-		onSubmit: handleSearch,
+	const getPatientsQuery = useQuery({
+		queryKey: ['plans'],
+		queryFn: getAllPlans,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
 	});
 
-	const [rows, setRows] = useState([
-		{
-			plan_id: '2',
-			plan_date: '12-12-2024',
-			department: 'Academics',
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '3',
-			plan_date: '12-12-2024',
-			department: 'Academics',
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '1',
-			plan_date: '12-12-2024',
-			department: 'Academics',
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '4',
-			plan_date: '12-12-2024',
-			department: 'Academics',
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-		{
-			plan_id: '5',
-			plan_date: '12-12-2024',
-			department: 'Academics',
-			report_date: '12-12-2024',
-			submitted_by: 'Abebe Bekele',
-		},
-	]);
+	useEffect(() => {
+		if (getPatientsQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
+			toast.error(
+				getPatientsQuery.error?.response?.data?.message ||
+					getPatientsQuery.error.message ||
+					'Error getting plans'
+			);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.error]);
+
+	useMemo(() => {
+		if (getPatientsQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlans', getPatientsQuery.data.data);
+			const patientList = getPatientsQuery.data?.data?.data;
+			setRows([...patientList]);
+		}
+	}, [getPatientsQuery.status, getPatientsQuery.data]);
 
 	const columns = [
 		{
-			field: 'plan_id',
-			headerName: 'Id',
-		},
-		{
-			field: 'plan_date',
-			headerName: 'Plan Date',
+			field: 'createdAt',
+			headerName: 'Created At',
 			flex: 1,
+			valueFormatter: (params) => {
+				const dob = formatDate(params);
+				return `${dob} G.C`;
+			},
 		},
 		{
 			field: 'department',
 			headerName: 'Department',
 			flex: 1,
+			valueFormatter: (params) => {
+				const deptName = getDepartmentByRole(params);
+				return deptName;
+			},
 		},
 		{
-			field: 'report_date',
-			headerName: 'Report Date',
+			field: 'year',
+			headerName: 'Year',
 			flex: 1,
 		},
 		{
-			field: 'submitted_by',
-			headerName: 'Submitted By',
+			field: 'status',
+			headerName: 'Status',
 			flex: 1,
 		},
 		{
@@ -110,12 +82,7 @@ function SPViewPlans() {
 			flex: 1,
 			renderCell: (params) => (
 				<Stack direction="row" width="100%" height="100%" display="flex" alignItems="center">
-					<Button
-						component={Link}
-						variant="outlined"
-						size="small"
-						to={`/strategic/plan/${params.row.plan_id}`}
-					>
+					<Button component={Link} variant="outlined" size="small" to={`/strategic/plan/${params.row._id}`}>
 						View
 					</Button>
 				</Stack>
@@ -128,111 +95,10 @@ function SPViewPlans() {
 			<Stack
 				direction="column"
 				display="flex"
-				justifyContent="space-between"
-				bgcolor={colors.grey[100]}
-				width="100%"
-				minHeight={150}
-				borderRadius="5px"
-				boxShadow={5}
-				p={2}
-				px={5}
-				gap={2}
-			>
-				<Typography variant="h5" component="p" fontWeight="bold">
-					View Plans
-				</Typography>
-				<Grid2
-					container
-					display="flex"
-					justifyContent="center"
-					alignItems="center"
-					width="100%"
-					gap={1}
-					component="form"
-					onSubmit={handleSubmit}
-					autoComplete="off"
-					noValidate
-				>
-					<Grid2 size={{ xs: 3 }}>
-						<TextField
-							name="year"
-							label="Year"
-							type="number"
-							fullWidth
-							value={values.year}
-							onChange={handleChange}
-							onBlur={handleBlur}
-							slotProps={{
-								htmlInput: {
-									min: 1,
-								},
-							}}
-							error={touched.year && !!errors.year}
-							helperText={touched.year && errors.year}
-						/>
-					</Grid2>
-					<Grid2 size={{ xs: 4 }}>
-						<SelectComponent
-							required={true}
-							touched={touched.department}
-							error={errors.department}
-							label="Department*"
-							name="department"
-							value={values.department}
-							onChange={handleChange}
-							onBlur={handleBlur}
-							options={[
-								{ value: 'all', label: 'All' },
-								{ value: 'av', label: getDepartmentByRole('av') },
-								{ value: 'vpo', label: getDepartmentByRole('vpo') },
-								{ value: 'rv', label: getDepartmentByRole('rv') },
-								{ value: 'ado', label: getDepartmentByRole('ado') },
-							]}
-						/>
-					</Grid2>
-					<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
-						<Button type="submit" fullWidth variant="contained" size="large">
-							Search Plan
-						</Button>
-					</Grid2>
-					<Grid2 size={{ xs: 9 }} display="flex" maxHeight="fit-content">
-						<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-							Plan for {values.year}
-						</Typography>
-					</Grid2>
-					<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
-						<Button
-							fullWidth
-							onClick={() => {
-								setConfirmOpen(true);
-							}}
-							variant="contained"
-							startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
-							sx={{ bgcolor: colors.aastuGold[500], color: colors.aastuBlue[500] }}
-							size="medium"
-						>
-							Approve Plan
-						</Button>
-						<ConfirmationModal
-							open={confirmOpen}
-							onCancel={closeConfirm}
-							onConfirm={() => {
-								handleApprove();
-								setConfirmOpen(false);
-							}}
-							title="Approve Plan"
-							message="Are you sure you want to approve this plan?"
-						/>
-					</Grid2>
-				</Grid2>
-			</Stack>
-			<Stack
-				direction="column"
-				display="flex"
 				bgcolor={colors.grey[100]}
 				width="100%"
 				height="fit-content"
-				minHeight={430}
+				minHeight={630}
 				borderRadius="5px"
 				boxShadow={5}
 				p={1}
@@ -244,7 +110,7 @@ function SPViewPlans() {
 				</Typography>
 				<DataGridWrapper>
 					<DataGrid
-						getRowId={(row) => row.plan_id}
+						getRowId={(row) => row._id}
 						rows={rows}
 						columns={columns}
 						slots={{ toolbar: CustomToolbar }}

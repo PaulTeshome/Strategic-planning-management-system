@@ -4,8 +4,6 @@ const APIError = require("../utils/apiError");
 const catchAsync = require("../utils/catchAsync");
 const handlerfactory = require("./handlerFactory");
 
-
-
 const createReport = handlerfactory.createOne(Report);
 const getReport = handlerfactory.getAll(Report);
 const getReportById = handlerfactory.getOne(Report);

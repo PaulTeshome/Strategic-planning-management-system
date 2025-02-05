@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { tokens } from '../../theme';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function ViewPlanTable({ columns, rows }) {
 	const theme = useTheme();
@@ -91,7 +92,7 @@ function ViewPlanTable({ columns, rows }) {
 					<TableBodyCell>{isKPI ? item.quarter_2 : ''}</TableBodyCell>
 					<TableBodyCell>{isKPI ? item.quarter_3 : ''}</TableBodyCell>
 					<TableBodyCell>{isKPI ? item.quarter_4 : ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.department : ''}</TableBodyCell>
+					<TableBodyCell>{isKPI ? getDepartmentByRole(item.department) : ''}</TableBodyCell>
 				</StyledTableRow>
 			);
 
@@ -124,7 +125,7 @@ function ViewPlanTable({ columns, rows }) {
 				<TableBody>
 					{renderTableRows(rows)}
 					{renderTableRows(rows).length === 0 && (
-						<StyledTableRow>
+						<StyledTableRow sx={{ height: 150 }}>
 							<TableBodyCell colSpan={11}>
 								<Typography textAlign="center">No Plan is Requested for approval yet</Typography>
 							</TableBodyCell>

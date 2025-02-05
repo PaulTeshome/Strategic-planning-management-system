@@ -6,7 +6,7 @@ export const tokens = (mode) => ({
 	...(mode === 'dark'
 		? {
 				white: '#000000',
-				black: '#c2c2c2',
+				black: '#ffffff',
 				grey: {
 					100: '#192b3f', // Darkest
 					200: '#3a4e66', // Transitioning to lighter grey

@@ -38,7 +38,7 @@ const Sidebar = () => {
 					<NavItem key="/vp/plan" title="Plan" to="/vp/plan" icon={<Book />} />
 					<NavItem key="/vp/report" title="Report" to="/vp/report" icon={<BarChartOutlinedIcon />} />
 					<NavItem key="/vp/schedule" title="Schedule" to="/vp/schedule" icon={<CalendarMonth />} />
-					<NavItem key="/vp/generate-plan" title="Generate Plan" to="/vp/generate-plan" icon={<Chat />} />
+					<NavItem key="/vp/generate-plan" title="Create Plan" to="/vp/generate-plan" icon={<Chat />} />
 				</Fragment>
 			),
 		},
@@ -61,7 +61,7 @@ const Sidebar = () => {
 						to="/strategic/schedule"
 						icon={<CalendarMonth />}
 					/>
-					<NavItem
+					{/* <NavItem
 						key="/strategic/integrate-plan"
 						title="Integrate Plan"
 						to="/strategic/integrate-plan"
@@ -72,7 +72,7 @@ const Sidebar = () => {
 						title="Integrate Report"
 						to="/strategic/integrate-report"
 						icon={<NextPlan />}
-					/>
+					/> */}
 					<NavItem key="/strategic/users" title="Users" to="/strategic/users" icon={<People />} />
 				</Fragment>
 			),

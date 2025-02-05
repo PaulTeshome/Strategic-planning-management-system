@@ -9,11 +9,13 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	Typography,
 } from '@mui/material';
 import React from 'react';
 import { tokens } from '../../theme';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
-function ViewReportTable({ columns, rows }) {
+function ViewReportTable({ columns, topColumns, rows }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 
@@ -59,39 +61,85 @@ function ViewReportTable({ columns, rows }) {
 		},
 	}));
 
-	const renderTableRows = (data) => {
-		const rows = [];
+	const renderTableRows = (rows) => {
+		const tableRows = [];
+		const date = Date();
 
 		const renderRow = (item, level = 0) => {
 			const isKPI = item.KPI_title !== undefined;
 
 			let className = '';
-			if (item.KPI_title) {
-				className = 'kpi';
-			} else if (item.detail_func_title) {
-				className = 'detail';
-			} else if (item.main_func_title) {
-				className = 'main';
-			} else if (item.main_goal) {
-				className = 'goal';
-			}
+			let textLabel = '';
+			let textName = '';
 
-			rows.push(
+			// let department_name = '';
+
+			if (item.KPI_title !== undefined) {
+				// // // console.log('🚀 ~ renderRow ~ item:', item);
+
+				className = 'kpi';
+				textLabel = 'KPI';
+				textName = 'KPI_title';
+
+				// department_name = `department_` + item.number.replace(/\./g, '_');
+			} else if (item.detail_func_title !== undefined) {
+				className = 'detail';
+				textLabel = 'Detail Function ';
+				textName = 'detail_func_title';
+			} else if (item.main_func_title !== undefined) {
+				className = 'main';
+				textLabel = 'Main Function';
+				textName = 'main_func_title';
+			} else if (item.main_goal !== undefined) {
+				className = 'goal';
+				textLabel = 'Main Goal';
+				textName = 'main_goal';
+			}
+			const goalSum =
+				parseFloat(item.quarter_1) +
+				parseFloat(item.quarter_2) +
+				parseFloat(item.quarter_3) +
+				parseFloat(item.quarter_4);
+			const performancePercentage =
+				((parseFloat(item?.quarter_1_progress || 0) +
+					parseFloat(item?.quarter_2_progress || 0) +
+					parseFloat(item?.quarter_3_progress || 0) +
+					parseFloat(item?.quarter_4_progress || 0)) /
+					goalSum) *
+				100;
+			const performColor =
+				performancePercentage > 70 ? 'green' : performancePercentage > 50 ? colors.aastuGold[600] : 'red';
+
+			tableRows.push(
 				<StyledTableRow key={item.number} className={className}>
 					<FirstColTableCell style={{ paddingLeft: `${level * 2 + 10}px` }}>{item.number}</FirstColTableCell>
-					<TableBodyCell style={{ paddingLeft: `${level * 2 + 10}px` }}>
-						{item.main_goal || item.main_func_title || item.detail_func_title || item.KPI_title}
+					<TableBodyCell colSpan={!isKPI ? 19 : 6} style={{ paddingLeft: `${level * 2 + 10}px` }}>
+						{item[textName]}
+						{` (Weight = ${item.weight})`}
 					</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.weight : item.weight || ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.measurement : ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.past_year : ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.present_goal : ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.quarter_goal : ''}</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.quarter_implementation : ''}</TableBodyCell>
-					<TableBodyCell>
-						{isKPI ? (item.quarter_implementation / item.quarter_goal) * 100 + '%' : ''}
-					</TableBodyCell>
-					<TableBodyCell>{isKPI ? item.department : ''}</TableBodyCell>
+
+					{isKPI && (
+						<>
+							<TableBodyCell>{item.measurement}</TableBodyCell>
+							<TableBodyCell>{item.past_year}</TableBodyCell>
+							<TableBodyCell>{item.present_goal}</TableBodyCell>
+							<TableBodyCell>{item.quarter_1}</TableBodyCell>
+							<TableBodyCell>{item.quarter_1_progress}</TableBodyCell>
+							<TableBodyCell>{item.quarter_2}</TableBodyCell>
+							<TableBodyCell>{item.quarter_2_progress}</TableBodyCell>
+							<TableBodyCell>{item.quarter_3}</TableBodyCell>
+							<TableBodyCell>{item.quarter_3_progress}</TableBodyCell>
+							<TableBodyCell>{item.quarter_4}</TableBodyCell>
+							<TableBodyCell>{item.quarter_4_progress}</TableBodyCell>
+
+							<TableBodyCell colSpan={0.5}>
+								<Typography color={performColor} fontWeight="bold">
+									{performancePercentage}%
+								</Typography>
+							</TableBodyCell>
+							<TableBodyCell>{getDepartmentByRole(item.department)}</TableBodyCell>
+						</>
+					)}
 				</StyledTableRow>
 			);
 
@@ -106,13 +154,20 @@ function ViewReportTable({ columns, rows }) {
 			}
 		};
 
-		data.forEach((item) => renderRow(item));
-		return rows;
+		rows.forEach((item) => renderRow(item));
+		return tableRows;
 	};
 	return (
 		<TableContainer component={Paper}>
 			<Table size="small" stickyHeader sx={{ tableLayout: 'auto' }} aria-label="ANC table">
 				<TableHead>
+					<StyledTableRow>
+						{topColumns.map((column, i) => (
+							<GroupedTableCell key={i} align="center" colSpan={column.colSpan}>
+								{column.name}
+							</GroupedTableCell>
+						))}
+					</StyledTableRow>
 					<StyledTableRow>
 						{columns.map((column, i) => (
 							<GroupedTableCell key={i} align="center" colSpan={column.colSpan}>

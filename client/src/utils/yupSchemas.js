@@ -6,6 +6,8 @@ import * as yup from 'yup';
 const phoneRegExp = /^[97]\d{8}$/;
 // const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
+const date = new Date();
+
 export const loginSchema = yup.object().shape({
 	email: yup.string().required('Email is required'),
 	password: yup.string().required('Password is required'),
@@ -14,6 +16,10 @@ export const loginSchema = yup.object().shape({
 export const vpPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
 	department: yup.string().required('Department is required'),
+});
+
+export const feedbackValidationSchema = yup.object().shape({
+	message: yup.string().required('Message is required'),
 });
 
 export const vpReportSchema = yup.object().shape({
@@ -41,7 +47,11 @@ export const userAddSchema = yup.object().shape({
 });
 
 export const generateReportSchema = yup.object().shape({
-	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
+	year: yup
+		.date()
+		.min(2024, 'past years are not allowed')
+		.typeError('Please specify a valid date!')
+		.required('required!'),
 	department: yup.string().required('Department is required'),
 	plan_document: yup
 		.mixed()

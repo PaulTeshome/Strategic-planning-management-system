@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
 import { vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
-import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
@@ -21,11 +20,12 @@ function VPplan() {
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [rows, setRows] = useState([]);
+	const date = new Date();
 
 	const { plan_id } = useParams();
 	const { getPlan, getBy } = usePlanApi();
 
-	const getPatientsQuery = useQuery({
+	const getPlanQuery = useQuery({
 		queryKey: ['plan', plan_id, 'requested'],
 		enabled: plan_id !== undefined && plan_id !== null,
 		queryFn: getPlan,
@@ -34,23 +34,21 @@ function VPplan() {
 	});
 
 	useEffect(() => {
-		if (getPatientsQuery.status === 'error') {
-			// console.log('🚀 ~ Patients ~ getPatientsQuery.error:', getPatientsQuery.error);
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
 			toast.error(
-				getPatientsQuery.error?.response?.data?.message ||
-					getPatientsQuery.error.message ||
-					'Error getting plans'
+				getPlanQuery.error?.response?.data?.message || getPlanQuery.error.message || 'Error getting plans'
 			);
 		}
-	}, [getPatientsQuery.status, getPatientsQuery.error]);
+	}, [getPlanQuery.status, getPlanQuery.error]);
 
 	useMemo(() => {
-		if (getPatientsQuery.status === 'success') {
-			console.log('🚀 ~ useMemo ~ getPlan', getPatientsQuery.data);
-			const patientList = getPatientsQuery.data?.data?.data[0]?.planData || [];
+		if (getPlanQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
+			const patientList = getPlanQuery.data?.data?.data[0]?.planData || [];
 			setRows([...patientList]);
 		}
-	}, [getPatientsQuery.status, getPatientsQuery.data]);
+	}, [getPlanQuery.status, getPlanQuery.data]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
@@ -59,13 +57,9 @@ function VPplan() {
 		console.log('🚀 ~ handleApprove ~ first:', values);
 	};
 
-	const date = new Date();
-	const [search, setSearch] = useState(false);
-
 	const handleSearch = (values) => {
-		const { year, department } = values;
-		console.log('🚀 ~ handleSearch ~ year:', typeof year);
-		setSearch(true);
+		// const { year, department } = values;
+		getByYearnDeptQ.refetch();
 	};
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
@@ -79,10 +73,10 @@ function VPplan() {
 
 	const getByYearnDeptQ = useQuery({
 		queryKey: ['plan', values.year, values.department, 'requested'],
-		enabled: search,
+		enabled: false,
 		queryFn: getBy,
 		staleTime: 1000 * 60 * 5,
-		// retry: false,
+		retry: false,
 	});
 
 	useEffect(() => {
@@ -97,8 +91,8 @@ function VPplan() {
 	useMemo(() => {
 		if (getByYearnDeptQ.status === 'success') {
 			console.log('🚀 ~ useMemo ~ getPlan', getByYearnDeptQ.data);
-			const patientList = getByYearnDeptQ.data?.data?.data[0]?.planData || [];
-			setRows([...patientList]);
+			const planData = getByYearnDeptQ.data?.data?.data[0]?.planData || [];
+			setRows([...planData]);
 		}
 	}, [getByYearnDeptQ.status, getByYearnDeptQ.data]);
 
@@ -169,7 +163,13 @@ function VPplan() {
 					/>
 				</Grid2>
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
-					<Button type="submit" fullWidth variant="contained" size="large">
+					<Button
+						type="submit"
+						disabled={getByYearnDeptQ.isLoading}
+						fullWidth
+						variant="contained"
+						size="large"
+					>
 						Search Plan
 					</Button>
 				</Grid2>
@@ -181,6 +181,7 @@ function VPplan() {
 				<Grid2 size={{ xs: 2 }} display="flex" maxHeight="fit-content">
 					<Button
 						fullWidth
+						disabled={rows.length === 0}
 						onClick={() => {
 							setConfirmOpen(true);
 						}}

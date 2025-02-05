@@ -15,7 +15,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { tokens } from '../../theme';
 import { Add, Delete, Save } from '@mui/icons-material';
 import { Formik } from 'formik';
@@ -29,6 +29,7 @@ function CreatePlanTable({ rows, setRows, year }) {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const { user } = useContext(MyContext);
+	const formikRefs = useRef({}); // Store Formik refs
 
 	const date = new Date();
 	const presentYear = date.getFullYear();
@@ -78,7 +79,35 @@ function CreatePlanTable({ rows, setRows, year }) {
 		},
 	}));
 
-	const handleLocalSave = () => {
+	const hasErrors = async () => {
+		let isValid = true;
+
+		// Validate each row
+		for (const key in formikRefs.current) {
+			const formikInstance = formikRefs.current[key];
+
+			if (formikInstance) {
+				const errors = await formikInstance.validateForm();
+				if (Object.keys(errors).length > 0) {
+					console.log('🚀 ~ hasErrors ~ key:', errors);
+					isValid = false;
+				}
+			}
+		}
+
+		if (!isValid) {
+			toast.error('Please fill all data in form before saving.');
+			return true;
+		}
+		return false;
+	};
+
+	const handleLocalSave = async () => {
+		// if (hasErrors()) {
+		// 	return;
+		// }
+
+		// Save to localStorage if all rows are valid
 		localStorage.setItem(`plan ${year}`, JSON.stringify(rows));
 		toast.success('Plan Saved Successfully!');
 		console.log(rows);
@@ -237,8 +266,26 @@ function CreatePlanTable({ rows, setRows, year }) {
 		});
 	};
 
+	const removeFormikValue = (fieldPrefix) => {
+		// Remove the KPI from Formik values
+
+		const fieldsToRemove = Object.keys(formikRefs.current).filter((key) => key.startsWith(fieldPrefix));
+		console.log('🚀 ~ removeFormikValue ~ fieldsToRemove:', fieldsToRemove);
+
+		// Update Formik values to remove the deleted KPI's fields
+		Object.values(formikRefs.current).forEach((formikInstance) => {
+			if (formikInstance) {
+				formikInstance.setValues((prevValues) => {
+					const newValues = { ...prevValues };
+					fieldsToRemove.forEach((field) => delete newValues[field]);
+					return newValues;
+				});
+			}
+		});
+	};
 	const removeGoal = (goalNumber) => {
 		setRows((prevRows) => reassignNumbers(prevRows.filter((goal) => goal.number !== goalNumber)));
+		removeFormikValue('main_goal_' + goalNumber.replace(/\./g, '_'));
 	};
 
 	const removeMain = (goalNumber, functionNumber) => {
@@ -406,6 +453,12 @@ function CreatePlanTable({ rows, setRows, year }) {
 
 			tableRows.push(
 				<Formik
+					enableReinitialize={true}
+					innerRef={(instance) => {
+						if (instance) {
+							formikRefs.current[TitleFieldName] = instance;
+						}
+					}}
 					key={TitleFieldName}
 					onSubmit={handleRowSubmit}
 					initialValues={{
@@ -443,8 +496,8 @@ function CreatePlanTable({ rows, setRows, year }) {
 										setFieldValue(TitleFieldName, event.target.value);
 									}}
 									value={values[TitleFieldName]}
-									error={touched[TitleFieldName] && Boolean(errors[TitleFieldName])}
-									helperText={touched[TitleFieldName] && errors[TitleFieldName]}
+									error={Boolean(errors[TitleFieldName])}
+									helperText={errors[TitleFieldName]}
 								/>
 							</TableBodyCell>
 							<TableBodyCell>
@@ -819,7 +872,17 @@ function CreatePlanTable({ rows, setRows, year }) {
 							))}
 						</StyledTableRow>
 					</TableHead>
-					<TableBody>{renderTableRows(rows)}</TableBody>
+					<TableBody>
+						{renderTableRows(rows)}
+
+						{renderTableRows(rows).length === 0 && (
+							<StyledTableRow sx={{ height: 150 }}>
+								<TableBodyCell colSpan={11}>
+									<Typography textAlign="center">Plan is not created or already submitted</Typography>
+								</TableBodyCell>
+							</StyledTableRow>
+						)}
+					</TableBody>
 				</Table>
 			</TableContainer>
 		</Grid2>

@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -10,20 +10,23 @@ import { mockReport } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useReportApi from '../../api/report';
+import toast from 'react-hot-toast';
 
 function VPReport() {
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [rows, setRows] = useState([]);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
 	};
-	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', values);
-	};
 
-	const handleSearch = () => {};
+	const handleSearch = () => {
+		getPlanQuery.refetch();
+	};
 	const date = new Date();
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
@@ -34,6 +37,71 @@ function VPReport() {
 		validationSchema: vpReportSchema,
 		onSubmit: handleSearch,
 	});
+
+	const { getRBy, updateReport } = useReportApi();
+
+	const [reportData, setReportData] = useState({});
+
+	const getPlanQuery = useQuery({
+		queryKey: ['report', values.year, values.department, 'requested'],
+		queryFn: getRBy,
+		staleTime: 1000 * 60 * 5,
+		enabled: false,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.error(
+				getPlanQuery.error?.response?.data?.message || getPlanQuery.error.message || 'Error getting plan',
+				{
+					id: 'getPlan',
+				}
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+			console.log('🚀 ~ useMemo ~ planData: page lvl', planData);
+			const repData = getPlanQuery.data?.data?.data[0];
+			setReportData({ ...repData });
+
+			setRows([...planData]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
+
+	const queryClient = useQueryClient();
+
+	const updatePlanMut = useMutation({
+		mutationFn: updateReport,
+		mutationKey: ['updateReport'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success('Update ' + response.status);
+			queryClient.invalidateQueries({ queryKey: ['report'] });
+
+			getPlanQuery.refetch();
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handleApprove = () => {
+		console.log('🚀 ~ handlePlanUpdate ~ reportData;:', reportData);
+
+		const data = {
+			status: 'approved',
+			report_id: reportData._id,
+		};
+
+		updatePlanMut.mutate(data);
+	};
 
 	return (
 		<Stack
@@ -138,19 +206,62 @@ function VPReport() {
 			</Grid2>
 
 			<ViewReportTable
+				topColumns={[
+					{ name: '', colSpan: 10 },
+					{ name: 'Quarter 1', colSpan: 2 },
+					{ name: 'Quarter 2', colSpan: 2 },
+					{ name: 'Quarter 3', colSpan: 2 },
+					{ name: 'Quarter 4', colSpan: 2 },
+				]}
 				columns={[
 					{ name: 'Number', colSpan: 1 },
-					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
+					{ name: 'Titles', colSpan: 5 },
 					{ name: 'Weights', colSpan: 1 },
 					{ name: 'Measurements', colSpan: 1 },
 					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
 					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
-					{ name: 'Quarter 1 and 2 goal', colSpan: 1 },
-					{ name: 'Quarter 1 and 2 implementation', colSpan: 1 },
-					{ name: 'Quarter 1 and 2 completeness by percentage', colSpan: 1 },
+					{
+						name: 'Plan',
+						colSpan: 1,
+					},
+					{
+						name: 'Progress',
+						colSpan: 1,
+					},
+
+					{
+						name: 'Plan',
+						colSpan: 1,
+					},
+					{
+						name: 'Progress',
+						colSpan: 1,
+					},
+
+					{
+						name: 'Plan',
+						colSpan: 1,
+					},
+					{
+						name: 'Progress',
+						colSpan: 1,
+					},
+
+					{
+						name: 'Plan',
+						colSpan: 1,
+					},
+					{
+						name: 'Progress',
+						colSpan: 1,
+					},
+					{
+						name: 'Performance',
+						colSpan: 0.5,
+					},
 					{ name: 'Department', colSpan: 1 },
 				]}
-				rows={mockReport}
+				rows={rows}
 			/>
 		</Stack>
 	);

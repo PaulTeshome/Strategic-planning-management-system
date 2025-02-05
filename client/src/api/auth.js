@@ -16,11 +16,15 @@ const useAuthApi = () => {
 	const getAllUsers = (data) => {
 		return axios.get('/users/', { withCredentials: true }).then((res) => res.data);
 	};
+	const getUser = ({ queryKey }) => {
+		const [, user_id] = queryKey;
+		return axios.get(`/users/${user_id}`, { withCredentials: true }).then((res) => res.data);
+	};
 	// const refreshToken = (data) => {
 	// 	return axios.post('/auth/refresh', data, { withCredentials: true }).then((res) => res.data);
 	// };
 
-	return { loginUser, logoutUser, registerUser, getAllUsers };
+	return { loginUser, logoutUser, registerUser, getAllUsers, getUser };
 };
 
 export default useAuthApi;

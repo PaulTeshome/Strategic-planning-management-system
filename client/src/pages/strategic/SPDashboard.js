@@ -12,6 +12,7 @@ import { formatDate } from '../../utils/formatDate';
 import usePlanApi from '../../api/plan';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function SPDashboard() {
 	const theme = useTheme();
@@ -54,21 +55,28 @@ function SPDashboard() {
 			flex: 1,
 			valueFormatter: (params) => {
 				const dob = formatDate(params);
-				// console.log('🚀 ~ Patients ~ params:', params);
-				return `${dob} G.C`; // Format the phone number as a string
+				return `${dob} G.C`;
 			},
 		},
 		{
 			field: 'department',
 			headerName: 'Department',
 			flex: 1,
+			valueFormatter: (params) => {
+				const deptName = getDepartmentByRole(params);
+				return deptName;
+			},
 		},
 		{
 			field: 'year',
 			headerName: 'Year',
 			flex: 1,
 		},
-
+		{
+			field: 'status',
+			headerName: 'Status',
+			flex: 1,
+		},
 		{
 			field: 'actions',
 			headerName: 'Actions',

@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Button, Grid2, Stack, TextField, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { tokens } from '../../theme';
 import { useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
@@ -13,8 +13,10 @@ import * as yup from 'yup';
 import CreatePlanTable from '../../components/tables/CreatePlanTable';
 import { useParams } from 'react-router-dom';
 import usePlanApi from '../../api/plan';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import InfoToast from '../../components/InfoToast';
+import useFeedbackApi from '../../api/feedback';
 
 const createPlanSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
@@ -42,16 +44,100 @@ function OPlan() {
 	const { user } = useContext(MyContext);
 	const colors = tokens(theme.palette.mode);
 	const { plan_id } = useParams();
+	const date = new Date();
 
-	const [plan, setPlan] = useState({ plan_id: plan_id });
+	const [update, setUpdate] = useState(false);
+
+	const [rows, setRows] = useState(() => {
+		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
+		return storedPlan ? JSON.parse(storedPlan) : [];
+	});
+	const [feedbacks, setFeedbacks] = useState([]);
+
+	const { getPlan, addStrategicPlan, updatePlan } = usePlanApi();
+	const { getAllFeedbacks } = useFeedbackApi();
+
+	const getPlanQuery = useQuery({
+		queryKey: ['plan', plan_id, 'pending'],
+		enabled: plan_id !== undefined && plan_id !== null,
+		queryFn: getPlan,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getPlanQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getPlanQuery.error:', getPlanQuery.error);
+			toast.custom(
+				<InfoToast
+					message={
+						getPlanQuery.error?.response?.data?.message ||
+						getPlanQuery.error.message ||
+						'Error getting plan'
+					}
+				/>,
+				{
+					id: 'getPlan',
+				}
+			);
+		}
+	}, [getPlanQuery.status, getPlanQuery.error]);
+
+	useMemo(() => {
+		if (getPlanQuery.status === 'success') {
+			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
+			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
+			// if (planData.length > 0) {
+			setUpdate(true);
+			// }
+			setRows([...planData]);
+		}
+	}, [getPlanQuery.status, getPlanQuery.data]);
+
+	const getFeedbackQuery = useQuery({
+		queryKey: ['feedback', plan_id],
+		enabled: getPlanQuery.status === 'success',
+		queryFn: getAllFeedbacks,
+		staleTime: 1000 * 60 * 5,
+		// retry: false,
+	});
+
+	useEffect(() => {
+		if (getFeedbackQuery.status === 'error') {
+			// console.log('🚀 ~ Patients ~ getFeedbackQuery.error:', getFeedbackQuery.error);
+			toast.custom(
+				<InfoToast
+					message={
+						getFeedbackQuery.error?.response?.data?.message ||
+						getFeedbackQuery.error.message ||
+						'Error getting plan'
+					}
+				/>,
+				{
+					id: 'get feedback',
+				}
+			);
+		}
+	}, [getFeedbackQuery.status, getFeedbackQuery.error]);
+
+	useMemo(() => {
+		if (getFeedbackQuery.status === 'success') {
+			// console.log('🚀 ~ useMemo ~ getFeedbackQuery', getFeedbackQuery.data);
+			const planData = getFeedbackQuery.data?.data?.data || [];
+			// console.log('🚀 ~ useMemo ~ planData:', planData);
+
+			setFeedbacks([...planData]);
+		}
+	}, [getFeedbackQuery.status, getFeedbackQuery.data]);
 
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [confirmUpdate, setConfirmUpdate] = useState(false);
 
 	const closeConfirm = () => {
 		setConfirmOpen(false);
+		setConfirmUpdate(false);
 	};
 
-	const { addStrategicPlan } = usePlanApi();
 	const queryClient = useQueryClient();
 
 	const addPlanMut = useMutation({
@@ -69,8 +155,44 @@ function OPlan() {
 		},
 	});
 
+	const updatePlanMut = useMutation({
+		mutationFn: updatePlan,
+		mutationKey: ['updatePlan'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success('Update ' + response.status);
+			queryClient.invalidateQueries({ queryKey: ['plans'] });
+			setUpdate(false);
+			getPlanQuery.refetch();
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handlePlanUpdate = () => {
+		const { year, department, plan_document } = planFormik.values;
+		console.log('🚀 ~ handlePlanUpdate ~ planFormik.values:', planFormik.values);
+		const data = {
+			year: year,
+			department: department,
+			plan_document: plan_document,
+			planData: [...rows],
+			status: 'submitted',
+			plan_id: plan_id,
+		};
+
+		updatePlanMut.mutate(data);
+	};
+
 	const handlePlanSubmit = (values) => {
 		const { year, department, plan_document, planData, status } = values;
+		if (planData.length === 0) {
+			toast.error('Please insert plan data before submission');
+			return;
+		}
 		const data = {
 			year: year,
 			department: department,
@@ -82,13 +204,6 @@ function OPlan() {
 
 		addPlanMut.mutate(data);
 	};
-
-	const date = new Date();
-
-	const [rows, setRows] = useState(() => {
-		const storedPlan = localStorage.getItem(`plan ${date.getFullYear()}`);
-		return storedPlan ? JSON.parse(storedPlan) : [];
-	});
 
 	const planFormik = useFormik({
 		initialValues: {
@@ -122,7 +237,7 @@ function OPlan() {
 			<Grid2
 				container
 				display="flex"
-				justifyContent="center"
+				justifyContent="flex-start"
 				alignItems="center"
 				width="100%"
 				gap={1}
@@ -132,16 +247,42 @@ function OPlan() {
 				noValidate
 			>
 				<Grid2 size={{ xs: 12 }} display="flex" alignItems="flex-end" pl="85%" maxHeight="fit-content">
-					<Button
-						onClick={() => {
-							setConfirmOpen(true);
+					{update ? (
+						<Button
+							onClick={() => {
+								setConfirmUpdate(true);
+							}}
+							fullWidth
+							variant="contained"
+							size="large"
+						>
+							Update Plan
+						</Button>
+					) : (
+						<Button
+							onClick={() => {
+								setConfirmOpen(true);
+							}}
+							fullWidth
+							variant="contained"
+							size="large"
+						>
+							Submit Plan
+						</Button>
+					)}
+
+					<ConfirmationModal
+						open={confirmUpdate}
+						onCancel={closeConfirm}
+						onConfirm={() => {
+							planFormik.validateForm();
+							handlePlanUpdate();
+							setConfirmUpdate(false);
 						}}
-						fullWidth
-						variant="contained"
-						size="large"
-					>
-						Submit Plan
-					</Button>
+						title="Update Plan"
+						message="Are you sure you want to update this plan?"
+					/>
+
 					<ConfirmationModal
 						open={confirmOpen}
 						onCancel={closeConfirm}
@@ -215,10 +356,40 @@ function OPlan() {
 				</Grid2>
 
 				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
-					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
+					<Typography variant="h6" component="p" fontWeight="bold" color={colors.textBlue[500]}>
 						Plan for {planFormik.values.year}
 					</Typography>
 				</Grid2>
+				<Grid2 size={{ xs: 12 }} pl={2} display="flex" maxHeight="fit-content">
+					<Typography variant="body1" component="p" color={colors.redAccent[500]}>
+						Feedbacks
+					</Typography>
+				</Grid2>
+				{feedbacks.length === 0 && (
+					<Grid2 size={{ xs: 12 }} pl={2} display="flex" maxHeight="fit-content">
+						<Typography variant="body2" component="p" color={colors.textBlue[500]}>
+							No feedbacks given
+						</Typography>
+					</Grid2>
+				)}
+				{feedbacks.map((feedback, index) => (
+					<Grid2
+						key={index + feedback.user_id}
+						size={{ xs: 3.8 }}
+						border={1.5}
+						borderRadius={1}
+						borderColor={colors.redAccent[400]}
+						bgcolor={colors.aastuGold[200]}
+						p={1}
+						display="flex"
+						maxHeight="fit-content"
+						minHeight={100}
+					>
+						<Typography variant="body2" component="p" color={colors.textBlue[500]}>
+							{feedback.message}
+						</Typography>
+					</Grid2>
+				))}
 			</Grid2>
 
 			<CreatePlanTable rows={rows} setRows={setRows} year={planFormik.values.year} />

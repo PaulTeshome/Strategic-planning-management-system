@@ -7,6 +7,8 @@ import { generateReportSchema } from '../../utils/yupSchemas';
 import SelectComponent from '../../components/form/SelectComponent';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
 
 function VPGenerate() {
 	const theme = useTheme();
@@ -25,8 +27,8 @@ function VPGenerate() {
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setFieldValue, submitForm } = useFormik({
 		initialValues: {
-			year: date.getFullYear(),
-			department: '',
+			year: dayjs(date),
+			department: 'all',
 			plan_document: null,
 		},
 		validationSchema: generateReportSchema,
@@ -51,26 +53,32 @@ function VPGenerate() {
 				autoComplete="off"
 				noValidate
 			>
-				<TextField
+				<DatePicker
+					required
 					name="year"
 					label="Year"
-					type="number"
-					fullWidth
-					// disabled
-					value={values.year}
-					onChange={handleChange}
+					disablePast={true}
+					views={['year']}
+					variant="outlined"
+					format="YYYY"
 					onBlur={handleBlur}
+					onChange={(date) => setFieldValue('year', date)}
+					value={values.year}
 					slotProps={{
-						htmlInput: {
-							min: date.getFullYear(),
+						textField: {
+							helperText: touched.year && errors.year ? errors.year : '',
+							error: touched.year && Boolean(errors.year) ? true : false,
+							fullWidth: true,
 						},
 					}}
-					error={touched.year && !!errors.year}
-					helperText={touched.year && errors.year}
+					InputLabelProps={{
+						shrink: true,
+					}}
 				/>
 
 				<SelectComponent
 					required={true}
+					disabled={true}
 					touched={touched.department}
 					error={errors.department}
 					label="Department*"

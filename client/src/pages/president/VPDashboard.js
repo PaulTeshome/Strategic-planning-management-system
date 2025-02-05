@@ -12,6 +12,7 @@ import usePlanApi from '../../api/plan';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { formatDate } from '../../utils/formatDate';
+import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
 
 function VPDashboard() {
 	const theme = useTheme();
@@ -62,10 +63,19 @@ function VPDashboard() {
 			field: 'department',
 			headerName: 'Department',
 			flex: 1,
+			valueFormatter: (params) => {
+				const deptName = getDepartmentByRole(params);
+				return deptName;
+			},
 		},
 		{
 			field: 'year',
 			headerName: 'Year',
+			flex: 1,
+		},
+		{
+			field: 'status',
+			headerName: 'Status',
 			flex: 1,
 		},
 
