@@ -25,6 +25,12 @@ export const feedbackValidationSchema = yup.object().shape({
 export const vpReportSchema = yup.object().shape({
 	year: yup.number().min(1, 'year cannot be negative number').required('Year is required'),
 	department: yup.string().required('Department is required'),
+	quarter: yup.string().required('Quarter is required'),
+	schedule: yup
+		.date()
+		.min(2024, 'past years are not allowed')
+		.typeError('Please specify a valid date!')
+		.required('required!'),
 });
 
 export const userAddSchema = yup.object().shape({

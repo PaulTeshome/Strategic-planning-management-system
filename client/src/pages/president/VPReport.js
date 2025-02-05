@@ -46,7 +46,7 @@ function VPReport() {
 		queryKey: ['report', values.year, values.department, 'requested'],
 		queryFn: getRBy,
 		staleTime: 1000 * 60 * 5,
-		enabled: false,
+		// enabled: false,
 		// retry: false,
 	});
 
@@ -65,7 +65,7 @@ function VPReport() {
 	useMemo(() => {
 		if (getPlanQuery.status === 'success') {
 			const planData = getPlanQuery.data?.data?.data[0]?.planData || [];
-			console.log('🚀 ~ useMemo ~ planData: page lvl', planData);
+			console.log('🚀 ~ useMemo ~ planData: page lvl vp', planData);
 			const repData = getPlanQuery.data?.data?.data[0];
 			setReportData({ ...repData });
 
@@ -161,7 +161,7 @@ function VPReport() {
 						onChange={handleChange}
 						onBlur={handleBlur}
 						options={[
-							{ value: 'all', label: 'All' },
+							// { value: 'all', label: 'All' },
 							{ value: 'av', label: getDepartmentByRole('av') },
 							{ value: 'vpo', label: getDepartmentByRole('vpo') },
 							{ value: 'rv', label: getDepartmentByRole('rv') },

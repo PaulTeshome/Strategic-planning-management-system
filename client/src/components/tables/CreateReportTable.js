@@ -305,7 +305,8 @@ function CreateReportTable({ rows, onCancel, setRows, year, reportData }) {
 				// // // console.log('🚀 ~ handleRowSubmit ~ value:', rows);
 			};
 
-			const Q1_pastDue = new Date(reportData.quarter_1_due_date).getTime() < Date.now();
+			// const Q1_pastDue = new Date(reportData.quarter_1_due_date).getTime() < Date.now();
+			const Q1_pastDue = false;
 			// // console.log('🚀 ~ renderRow ~ Q1_pastDue:', Q1_pastDue);
 			const Q2_pastDue = new Date(reportData.quarter_2_due_date).getTime() < Date.now();
 			// // console.log('🚀 ~ renderRow ~ Q2_pastDue:', Q2_pastDue);

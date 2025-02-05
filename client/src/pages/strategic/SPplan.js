@@ -27,7 +27,7 @@ function SPplan() {
 	const { plan_id } = useParams();
 	const { getPlan, getBy, updatePlan } = usePlanApi();
 
-	const [selectedPlan, setSelectedPlan] = useState({ _id: plan_id });
+	const [selectedPlan, setSelectedPlan] = useState({ _id: plan_id, year: 2025 });
 
 	const getPlanQuery = useQuery({
 		queryKey: ['plan', plan_id, 'submitted'],
@@ -50,6 +50,9 @@ function SPplan() {
 		if (getPlanQuery.status === 'success') {
 			console.log('🚀 ~ useMemo ~ getPlan', getPlanQuery.data);
 			const patientList = getPlanQuery.data?.data?.data[0]?.planData || [];
+			const planInfo = getPlanQuery.data?.data?.data[0];
+			console.log('🚀 ~ useMemo ~ planInfo:', planInfo);
+			setSelectedPlan({ ...planInfo });
 			setRows([...patientList]);
 		}
 	}, [getPlanQuery.status, getPlanQuery.data]);
@@ -65,11 +68,12 @@ function SPplan() {
 
 	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setTouched, validateForm } = useFormik({
 		initialValues: {
-			year: date.getFullYear(),
+			year: selectedPlan?.year || date.getFullYear(),
 			department: '',
 		},
 		validationSchema: vpPlanSchema,
 		onSubmit: handleSearch,
+		enableReinitialize: true,
 	});
 
 	const getByYearnDeptQ = useQuery({
@@ -232,7 +236,7 @@ function SPplan() {
 				</Grid2>
 				<Grid2 size={{ xs: 12 }} display="flex" maxHeight="fit-content">
 					<Typography variant="h6" component="p" color={colors.textBlue[500]}>
-						Plan for {values.year}
+						Plan for {selectedPlan.year}
 					</Typography>
 				</Grid2>
 				<Grid2 size={{ xs: 12 }} display="flex" pl="80%" maxHeight="fit-content">
@@ -320,8 +324,8 @@ function SPplan() {
 					{ name: 'Strategic Goals , Main Activities, Detail functions and KPIs', colSpan: 1 },
 					{ name: 'Weights', colSpan: 1 },
 					{ name: 'Measurements', colSpan: 1 },
-					{ name: `Previous year(${values.year - 1}) value`, colSpan: 1 },
-					{ name: `This year(${values.year}) Goal`, colSpan: 1 },
+					{ name: `Previous year(${selectedPlan.year - 1}) value`, colSpan: 1 },
+					{ name: `This year(${selectedPlan.year}) Goal`, colSpan: 1 },
 					{ name: 'Quarter 1', colSpan: 1 },
 					{ name: 'Quarter 2', colSpan: 1 },
 					{ name: 'Quarter 3', colSpan: 1 },
