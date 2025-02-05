@@ -82,21 +82,21 @@ const ReportSchema = new Schema({
   // quarter one due date, quater two due date, quarter three due date, quarter four due date
 
 
-  quater_1_due_date: {
+  quarter_1_due_date: {
     type: Date,
-    default: Date.now,
+    default: null,
   },
-  quater_2_due_date: {
+  quarter_2_due_date: {
     type: Date,
-    default: Date.now,
+    default: null,
   },
-  quater_3_due_date: {
+  quarter_3_due_date: {
     type: Date,
-    default: Date.now,
+    default: null,
   },
-  quater_4_due_date: {
+  quarter_4_due_date: {
     type: Date,
-    default: Date.now,
+    default: null,
   },
 
   createdAt: {
