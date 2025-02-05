@@ -73,6 +73,11 @@ function SPDashboard() {
 			flex: 1,
 		},
 		{
+			field: 'status',
+			headerName: 'Status',
+			flex: 1,
+		},
+		{
 			field: 'actions',
 			headerName: 'Actions',
 			disableExport: true,
