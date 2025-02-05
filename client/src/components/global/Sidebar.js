@@ -61,7 +61,7 @@ const Sidebar = () => {
 						to="/strategic/schedule"
 						icon={<CalendarMonth />}
 					/>
-					<NavItem
+					{/* <NavItem
 						key="/strategic/integrate-plan"
 						title="Integrate Plan"
 						to="/strategic/integrate-plan"
@@ -72,7 +72,7 @@ const Sidebar = () => {
 						title="Integrate Report"
 						to="/strategic/integrate-report"
 						icon={<NextPlan />}
-					/>
+					/> */}
 					<NavItem key="/strategic/users" title="Users" to="/strategic/users" icon={<People />} />
 				</Fragment>
 			),

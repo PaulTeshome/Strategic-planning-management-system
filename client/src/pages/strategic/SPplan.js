@@ -6,7 +6,6 @@ import { Formik, useFormik } from 'formik';
 import SelectComponent from '../../components/form/SelectComponent';
 import { feedbackValidationSchema, vpPlanSchema } from '../../utils/yupSchemas';
 import ViewPlanTable from '../../components/tables/ViewPlanTable';
-import { mockPlan } from '../../components/data/mockData';
 import { CheckCircle } from '@mui/icons-material';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { getDepartmentByRole } from '../../utils/getDepartmentByRole';
@@ -26,7 +25,7 @@ function SPplan() {
 	const date = new Date();
 
 	const { plan_id } = useParams();
-	const { getPlan, getBy } = usePlanApi();
+	const { getPlan, getBy, updatePlan } = usePlanApi();
 
 	const [selectedPlan, setSelectedPlan] = useState({ _id: plan_id });
 
@@ -58,16 +57,13 @@ function SPplan() {
 	const closeConfirm = () => {
 		setConfirmOpen(false);
 	};
-	const handleApprove = () => {
-		console.log('🚀 ~ handleApprove ~ first:', values);
-	};
 
 	const handleSearch = (values) => {
 		// const { year, department } = values;
 		getByYearnDeptQ.refetch();
 	};
 
-	const { values, errors, handleSubmit, handleBlur, handleChange, touched } = useFormik({
+	const { values, errors, handleSubmit, handleBlur, handleChange, touched, setTouched, validateForm } = useFormik({
 		initialValues: {
 			year: date.getFullYear(),
 			department: '',
@@ -135,6 +131,34 @@ function SPplan() {
 		addFeedMut.mutate(data);
 	};
 
+	const updatePlanMut = useMutation({
+		mutationFn: updatePlan,
+		mutationKey: ['updatePlan'],
+		onSuccess: (response) => {
+			// // console.log('🚀 ~ AddNewPatient ~ response:', response);
+			toast.success('Update ' + response.status);
+			queryClient.invalidateQueries({ queryKey: ['plans'] });
+			// setUpdate(false);
+			getPlanQuery.refetch();
+		},
+		onError: (error) => {
+			// // console.log('🚀 ~ AddNewPatient ~ error:', error);
+
+			toast.error(error.response.data.message || error.response.statusText);
+		},
+	});
+
+	const handleApprove = (values) => {
+		console.log('🚀 ~ handleApprove ~ first:', values);
+		const data = { plan_id: selectedPlan._id, status: 'requested' };
+		if (selectedPlan._id === undefined || selectedPlan._id === null) {
+			toast.error('Please select a plan for approval!');
+			return;
+		}
+		updatePlanMut.mutate(data);
+		// console.log('🚀 ~ handleApprove ~ data:', data);
+	};
+
 	return (
 		<Stack
 			direction="column"
@@ -193,7 +217,7 @@ function SPplan() {
 						onChange={handleChange}
 						onBlur={handleBlur}
 						options={[
-							{ value: 'all', label: 'All' },
+							// { value: 'all', label: 'All' },
 							{ value: 'av', label: getDepartmentByRole('av') },
 							{ value: 'vpo', label: getDepartmentByRole('vpo') },
 							{ value: 'rv', label: getDepartmentByRole('rv') },
@@ -214,8 +238,19 @@ function SPplan() {
 				<Grid2 size={{ xs: 12 }} display="flex" pl="80%" maxHeight="fit-content">
 					<Button
 						fullWidth
-						onClick={() => {
-							setConfirmOpen(true);
+						onClick={async () => {
+							// const errors = await validateForm(); // Validate form fields
+							// setTouched({
+							// 	year: true,
+							// 	department: true,
+							// });
+
+							// if (Object.keys(errors).length === 0) {
+							handleApprove(values);
+							setConfirmOpen(false);
+							// } else {
+							// 	toast.error('Please fix validation errors before proceeding.');
+							// }
 						}}
 						variant="contained"
 						startIcon={<CheckCircle sx={{ textDecorationColor: colors.aastuBlue[500] }} />}
@@ -228,7 +263,7 @@ function SPplan() {
 						open={confirmOpen}
 						onCancel={closeConfirm}
 						onConfirm={() => {
-							handleApprove();
+							handleApprove(values);
 							setConfirmOpen(false);
 						}}
 						title="Approve Plan"
